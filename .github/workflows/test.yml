@@ -1,0 +1,54 @@
+name: Assume Role
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - cfn/management/**
+  # pull_request:
+  #   paths:
+  #     - cfn/management/**
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Cross Account Example
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - run: sleep 5 # there's still a race condition for now
+
+      - name: Check out repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Configure AWS credentials for entry into Management Account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::111111111111:role/Github-Bootstrap
+          role-session-name: MgmtBootstrapSession
+          aws-region: ap-southeast-2
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+
+      - name: SetBootstrap ENV
+        id: bootstrap
+        run: |
+          echo "::set-output name=AWSAKID::$(echo $AWS_ACCESS_KEY_ID)"
+          echo "::set-output name=AWSASAK::$(echo $AWS_SECRET_ACCESS_KEY)"
+          echo "::set-output name=AWSSTKN::$(echo $AWS_SESSION_TOKEN)"
+
+      - name: Configure AWS credentials for Management Admin
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.bootstrap.outputs.AWSAKID }} 
+          aws-secret-access-key: ${{ steps.bootstrap.outputs.AWSASAK }}
+          aws-session-token: ${{ steps.bootstrap.outputs.AWSSTKN }}
+          aws-region: ap-southeast-2
+          role-to-assume: arn:aws:iam::222222222222:role/Github-Admin
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+          role-session-name: MgmtAdminSession

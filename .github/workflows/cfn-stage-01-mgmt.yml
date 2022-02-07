@@ -1,0 +1,153 @@
+name: CFN Stage 01 Bedrock Management
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - cfn/management/**
+  # pull_request:
+  #   paths:
+  #     - cfn/management/**
+  workflow_dispatch:
+
+jobs:
+
+  build-matrix:
+    name: Build Parameters from JSON
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      a1: ${{ steps.set-matrix.outputs.a1 }}
+      o1: ${{ steps.set-matrix.outputs.o1 }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Create Mapping JSON
+        id: set-matrix
+        run: |
+          j1="{\"include\": ["
+          Params=$(jq --compact-output 'map({(.ParameterKey):(.ParameterValue)}) | add' ${{ github.workspace }}/parameters.json)
+          jx="]}"
+          res="${j1} ${Params} ${jx}"
+          JSON=$(echo ${res} | jq -c .)
+          echo "::set-output name=matrix::${JSON}"
+          AllAccounts=$(jq --compact-output --raw-output 'map({(.ParameterKey):(.ParameterValue)}) | add | to_entries[] | select(.key|endswith("AccountId")).value ' ${{ github.workspace }}/parameters.json )
+          OpsAccounts=$(jq --compact-output --raw-output 'map({(.ParameterKey):(.ParameterValue)}) | add | to_entries[] | select(.key|endswith("AccountId") and (startswith("Management") or startswith("Security") | not)).value ' ${{ github.workspace }}/parameters.json )
+          a1=$(echo $AllAccounts | sed 's/ /,/g')
+          o1=$(echo $OpsAccounts | sed 's/ /,/g')
+          echo $a1
+          echo $o1
+          echo "::set-output name=a1::$(echo $a1)"
+          echo "::set-output name=o1::$(echo $o1)"
+
+  check-matrix:
+    name: Check Parameters
+    runs-on: ubuntu-latest
+    needs: build-matrix
+    steps:
+      - name: Install json2yaml
+        run: |
+          sudo npm install -g json2yaml
+
+      - name: Check matrix definition
+        run: |
+          matrix='${{ needs.build-matrix.outputs.matrix }}'
+          a1='${{ needs.build-matrix.outputs.a1 }}'
+          o1='${{ needs.build-matrix.outputs.o1 }}'
+          echo $matrix
+          echo $matrix | jq .
+          echo $matrix | json2yaml
+          echo $a1
+          echo $o1
+
+  build:
+    name: Management Resources
+    needs: build-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.build-matrix.outputs.matrix)}}
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - run: sleep 5 # there's still a race condition for now
+
+      - name: Check out repo
+        uses: actions/checkout@v2
+        with:
+          ref: main
+
+      - name: Setup Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Configure AWS credentials for entry into Management Account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ matrix.ManagementAccountId }}:role/Github-Bootstrap
+          role-session-name: MgmtBootstrapSession
+          aws-region: ${{ matrix.BaseRegion }}
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+
+      - name: Setup AWS SAM for Serverless deployments
+        uses: aws-actions/setup-sam@v1
+
+      - name: SAM Deploy of StackSet Roles
+        if: github.ref == 'refs/heads/main'
+        run: |
+          sam deploy \
+          --template-file ${{ github.workspace }}/cfn/management/stackset-role.yml \
+          --stack-name Bedrock-StackSet-Roles \
+          --no-confirm-changeset \
+          --no-fail-on-empty-changeset \
+          --capabilities CAPABILITY_NAMED_IAM \
+          --no-disable-rollback \
+          --region ${{ matrix.BaseRegion }}
+
+      - name: execute Lambda to create Admin Roles
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws lambda invoke \
+          --function-name bedrock-stackset-role-deployment \
+          --invocation-type RequestResponse \
+          --cli-binary-format raw-in-base64-out \
+          --payload '{ "RequestType": "Create" , "ResponseURL": "http://pre-signed-S3-url-for-response", "LogicalResourceId": "MyTestResource", "StackId": "arn:aws:cloudformation:ap-southeast-2:123456789012:stack/MyStack/guid", "RequestId": "unique id for this create request" }' \
+          response.json
+
+      - name: SetBootstrap ENV
+        id: bootstrap
+        run: |
+          echo "::set-output name=AWSAKID::$(echo $AWS_ACCESS_KEY_ID)"
+          echo "::set-output name=AWSASAK::$(echo $AWS_SECRET_ACCESS_KEY)"
+          echo "::set-output name=AWSSTKN::$(echo $AWS_SESSION_TOKEN)"
+
+      - name: Configure AWS credentials for Management Admin
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.bootstrap.outputs.AWSAKID }} 
+          aws-secret-access-key: ${{ steps.bootstrap.outputs.AWSASAK }}
+          aws-session-token: ${{ steps.bootstrap.outputs.AWSSTKN }}
+          aws-region: ${{ matrix.BaseRegion }}
+          role-to-assume: arn:aws:iam::${{ matrix.ManagementAccountId }}:role/Github-Admin
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+          role-session-name: MgmtAdminSession
+
+      - name: Create Billing S3 Bucket
+        id: Billing
+        if: github.ref == 'refs/heads/main'
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: Management-Billing-Bucket
+          template: ${{ github.workspace }}/cfn/management/billing-bucket.yml
+          capabilities: CAPABILITY_NAMED_IAM
+          parameter-overrides: |
+            UniquePrefix=${{ matrix.UniquePrefix }}
+          tags: '[ { "Key": "Environment", "Value": "Management" } ]'
+          no-fail-on-empty-changeset: 1
+          #file://${{ github.workspace }}/repo/parameters.json

@@ -1,0 +1,21 @@
+name: Scan CFN
+on:
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - cfn/**
+  # pull_request:
+  #   paths:
+  #     - cfn/**
+  workflow_dispatch:
+
+jobs:
+  security-scan-nag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run a container
+      run: docker compose up
+
