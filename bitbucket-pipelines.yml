@@ -6,4 +6,4 @@ pipelines:
         oidc: true
         max-time: 5
         script:
-          - aws sts assume-role-with-web-identity --role-arn arn:aws:iam::XXXXXX:role/projectx-build --role-session-name build-session  --web-identity-token "$BITBUCKET_STEP_OIDC_TOKEN" --duration-seconds 1000
+          - aws sts assume-role-with-web-identity --role-arn arn:aws:iam::610275232156:role/Bitbucket-Bootstrap --role-session-name build-session  --web-identity-token "$BITBUCKET_STEP_OIDC_TOKEN" --duration-seconds 3600

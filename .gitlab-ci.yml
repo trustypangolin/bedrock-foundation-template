@@ -5,8 +5,6 @@ image:
 
 assume role:
   script:
-    - echo ${ROLE_ARN}
-    - echo $CI_JOB_JWT_V2 > tokenfile.json
     - >
       STS=($(aws sts assume-role-with-web-identity
       --role-arn ${ROLE_ARN}
