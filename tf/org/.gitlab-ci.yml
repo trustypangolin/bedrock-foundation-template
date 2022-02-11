@@ -6,8 +6,6 @@ stages:
 
 # Need AWS credentials and correct role setup for further jobs
 aws_account:
-  tags:
-    - shell
   stage: aws_creds
   before_script:
     - cd tf/${ENVIRONMENT}
@@ -16,9 +14,13 @@ aws_account:
   artifacts:
     reports:
       dotenv: tf/${ENVIRONMENT}/credentials.env
+    paths:
+      - tf/${ENVIRONMENT}/token.json
 
 import_org:
   stage: terraform_import
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs:
     - job: aws_account
       artifacts: true
@@ -48,12 +50,12 @@ terraform_plan:
     - ../deploy/tf_plan.sh
   artifacts:
     paths:
-      - plan
+      - tf/${ENVIRONMENT}/plan
 
 # Only main branch will apply the IaC
 terraform_apply:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   stage: terraform_apply
   needs:
     - job: aws_account

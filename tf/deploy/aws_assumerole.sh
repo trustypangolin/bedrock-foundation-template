@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo $CI_JOB_JWT_V2 > token.json
 # Assume the Role that trusts the OIDC IdP using Web Identity
 STS=($(aws sts assume-role-with-web-identity                          \
 --role-arn arn:aws:iam::${account}:role/GitLab-Bootstrap              \
