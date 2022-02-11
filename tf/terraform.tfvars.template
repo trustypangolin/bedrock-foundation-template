@@ -1,7 +1,7 @@
 // Gitlab variables
 gitlab_url      = "https://gitlab.com"
 aud_value       = "https://gitlab.com"
-gitlab_match    = ["project_path:yourproject/*:ref_type:branch:ref:main"]
+gitlab_match    = ["project_path:yourproject/*:ref_type:branch:ref:*"]
 gitlab_field    = "sub"
 
 // Github Variables

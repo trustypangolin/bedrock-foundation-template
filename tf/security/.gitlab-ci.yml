@@ -1,94 +1,52 @@
 stages:
-  - assume_role
-  - iac_validate
-  - iac_plan
+  - aws_creds
+  - terraform_plan
+  - terraform_apply
 
+# Need AWS credentials and correct role setup for further jobs
 aws_account:
-  stage: assume_role
-  image:
-    name: amazon/aws-cli:latest
-    entrypoint:
-      - "/usr/bin/env"
-  script:
-    - >
-      STS=($(aws sts assume-role-with-web-identity
-      --role-arn arn:aws:iam::${account}:role/GitLab-Bootstrap
-      --role-session-name "GitLabRunner-${CI_PROJECT_ID}-${CI_PIPELINE_ID}"
-      --web-identity-token $CI_JOB_JWT_V2
-      --duration-seconds 3600
-      --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]'
-      --output text))
-    - export AWS_ACCESS_KEY_ID="${STS[0]}"
-    - export AWS_SECRET_ACCESS_KEY="${STS[1]}"
-    - export AWS_SESSION_TOKEN="${STS[2]}"
-
-    - STSADMIN=($(aws sts assume-role
-      --role-arn arn:aws:iam::${account}:role/GitLab-Admin
-      --role-session-name "Admin-${CI_PROJECT_ID}-${CI_PIPELINE_ID}"
-      --duration-seconds 3600
-      --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]'
-      --output text))
-
-    - echo "AWS_ACCESS_KEY_ID=${STSADMIN[0]}" > credentials.env
-    - echo "AWS_SECRET_ACCESS_KEY=${STSADMIN[1]}" >> credentials.env
-    - echo "AWS_SESSION_TOKEN=${STSADMIN[2]}" >> credentials.env
-  artifacts:
-    reports:
-      dotenv: credentials.env
-
-terraform_validate:
-  stage: iac_validate
-  image:
-    name: hashicorp/terraform:latest
-    entrypoint:
-      - /usr/bin/env
-      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+  stage: aws_creds
   before_script:
     - cd tf/${ENVIRONMENT}
-    - terraform init
-  cache:
-    key: terraform
-    paths:
-      - .terraform
   script:
-    - terraform validate
-  # except:
-  #   refs:
-  #     - master
+    - ../deploy/aws_assumerole.sh
+  artifacts:
+    reports:
+      dotenv: tf/${ENVIRONMENT}/credentials.env
 
 terraform_plan:
-  stage: iac_plan
+  stage: terraform_plan
   needs:
     - job: aws_account
       artifacts: true
-  image:
-    name: hashicorp/terraform:latest
-    entrypoint:
-      - /usr/bin/env
-      - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
   before_script:
     - cd tf/${ENVIRONMENT}
   cache:
     key: terraform
     paths:
-      - .terraform
+      - tf/${ENVIRONMENT}/.terraform
   script:
-    - if [ ! -f terraform.tfvars ]; then cat "$mgmt" > "terraform.tfvars"; else echo "tfvars part of repo"; fi
-    - if [ ! -f remote_state.tf ]; then cat "$remotestate" > "remote_state.tf"; else echo "remote_state.tf part of repo"; fi
-    - export S3Bucket=$(cat terraform.tfvars | grep unique_prefix | cut -d = -f2 | tr -d '[:blank:]"')
-    - > 
-      terraform init 
-      -backend-config="bucket=$S3Bucket-tfstate"
-      -backend-config="key=${ENVIRONMENT}"
-    - terraform plan --out plan
-  # only:
-  #   refs:
-  #     - master
+    - ../deploy/tf_state.sh
+    - ../deploy/tf_plan.sh
   artifacts:
     paths:
-      - plan
-# include:
-#   - template: Security/SAST-IaC.latest.gitlab-ci.yml
-# variables:
-#   SECURE_LOG_LEVEL: debug
+      - tf/${ENVIRONMENT}/plan
+
+# Only main branch will apply the IaC
+terraform_apply:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  stage: terraform_apply
+  needs:
+    - job: aws_account
+      artifacts: true
+  before_script:
+    - cd tf/${ENVIRONMENT}
+  cache:
+    key: terraform
+    paths:
+      - tf/${ENVIRONMENT}/.terraform
+  script:
+      - ../deploy/tf_state.sh
+      - ../deploy/tf_deploy.sh
 

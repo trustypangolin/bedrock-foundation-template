@@ -1,29 +1,27 @@
 resource "aws_s3_bucket" "log_bucket" {
   bucket = format("%s-logging", var.unique_prefix)
-  acl    = "log-delivery-write"
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
   #checkov:skip=CKV_AWS_145:No Cross Account
   #checkov:skip=CKV_AWS_144:No Cross Region
   #checkov:skip=CKV_AWS_21:Versioning not required
   #checkov:skip=CKV_AWS_18:This is the logging bucket
 }
 
+resource "aws_s3_bucket_acl" "log_bucket" {
+  bucket = aws_s3_bucket.log_bucket.id
+  acl    = "log-delivery-write"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
+  bucket = aws_s3_bucket.log_bucket.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
 resource "aws_s3_bucket" "cur" {
   bucket = format("%s-cur", var.unique_prefix)
-  # acl    = "private"
-  # server_side_encryption_configuration {
-  #   rule {
-  #     apply_server_side_encryption_by_default {
-  #       sse_algorithm = "AES256"
-  #     }
-  #   }
-  # }
   logging {
     target_bucket = aws_s3_bucket.log_bucket.id
     target_prefix = "log/"
