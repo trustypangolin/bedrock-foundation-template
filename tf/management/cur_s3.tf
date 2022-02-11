@@ -16,14 +16,14 @@ resource "aws_s3_bucket" "log_bucket" {
 
 resource "aws_s3_bucket" "cur" {
   bucket = format("%s-cur", var.unique_prefix)
-  acl    = "private"
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
+  # acl    = "private"
+  # server_side_encryption_configuration {
+  #   rule {
+  #     apply_server_side_encryption_by_default {
+  #       sse_algorithm = "AES256"
+  #     }
+  #   }
+  # }
   logging {
     target_bucket = aws_s3_bucket.log_bucket.id
     target_prefix = "log/"
@@ -31,6 +31,27 @@ resource "aws_s3_bucket" "cur" {
   #checkov:skip=CKV_AWS_145:No Cross Account
   #checkov:skip=CKV_AWS_144:No Cross Region
   #checkov:skip=CKV_AWS_21:Versioning not required
+}
+
+resource "aws_s3_bucket_acl" "cur" {
+  bucket = aws_s3_bucket.cur.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "cur" {
+  bucket = aws_s3_bucket.cur.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cur" {
+  bucket = aws_s3_bucket.cur.bucket
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "cur" {

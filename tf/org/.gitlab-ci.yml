@@ -50,7 +50,10 @@ terraform_plan:
     paths:
       - plan
 
+# Only main branch will apply the IaC
 terraform_apply:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
   stage: terraform_apply
   needs:
     - job: aws_account

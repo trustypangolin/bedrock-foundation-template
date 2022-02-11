@@ -12,6 +12,7 @@ echo "Checking AWS for existing resources - S3 State"
 echo s3=$(aws s3api list-buckets | grep "tfstate" | cut -d : -f2 | tr -d '[:blank:]\",') >> org.env
 s3=$(aws s3api list-buckets | grep "tfstate" | cut -d : -f2 | tr -d '[:blank:]\",')
 
+# Import the existing Organisation setup, this is created via SSO automatically, but we need it for account IDs
 if terraform state show 'aws_organizations_organization.org' 2>/dev/null; then
   echo -e "org state already imported"
 else
@@ -19,6 +20,7 @@ else
   terraform import aws_organizations_organization.org $orgid
 fi
 
+# The bootstrap S3 state bucket should be managed going forward
 if terraform state show 'aws_s3_bucket.tfstate' 2>/dev/null; then
   echo -e "s3 state already imported"
 else
@@ -40,6 +42,7 @@ else
   terraform import aws_s3_bucket_policy.tfstate $s3
 fi
 
+# The bootstrap Dynamodb state should be managed going forward
 if terraform state show 'aws_dynamodb_table.terraform' 2>/dev/null; then
   echo -e "dynamodb state already imported"
 else
