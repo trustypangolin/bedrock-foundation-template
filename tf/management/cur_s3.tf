@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "log_bucket" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm     = "AES256"
+        sse_algorithm = "AES256"
       }
     }
   }
@@ -20,7 +20,7 @@ resource "aws_s3_bucket" "cur" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm     = "AES256"
+        sse_algorithm = "AES256"
       }
     }
   }
@@ -98,7 +98,7 @@ resource "aws_cur_report_definition" "cur_report_definition" {
   compression                = "Parquet"
   additional_schema_elements = ["RESOURCES"]
   s3_bucket                  = aws_s3_bucket.cur.id
-  s3_region                  = var.BaseRegion
+  s3_region                  = var.base_region
 }
 
 resource "aws_s3_bucket_public_access_block" "cur" {

@@ -2,10 +2,4 @@
 unique_prefix    = "uniqueidentity"  
 
 // These variables are common and defaults, but can be changed if required
-BaseRegion = "ap-southeast-2"
-
-// These are merged in every resource supporting tags.
-AllTags = {
-  Service   = "Bedrock"
-  Version   = "3.0.0"
-}
+base_region = "ap-southeast-2"

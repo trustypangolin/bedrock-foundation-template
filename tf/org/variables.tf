@@ -9,11 +9,11 @@ variable "unique_prefix" {
   description = "prefix used to be part of resource name"
 }
 
-variable "tags" {
-  description = "Tags to set on resources"
-  type        = map(string)
-  default = {
-    Version = "1.0.0"
-  }
-}
+# variable "tags" {
+#   description = "Tags to set on resources"
+#   type        = map(string)
+#   default = {
+#     Version = "1.0.0"
+#   }
+# }
 

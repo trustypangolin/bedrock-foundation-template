@@ -1,8 +1,17 @@
-gitlab_url      = "https://gitlab.example.com"
-aud_value       = "https://gitlab.example.com"
-match_field     = "sub"
-match_value     = ["project_path:mygroup/*:ref_type:branch:ref:main"]
-match_github    = ["repo:yourorg/yourrepo:*"]
-assume_role_arn = ["arn:aws:iam::9999:policy/name_of_policy"]
-bitbucket_workspace = "yourworspace"
-bitbucket_workspaceid = "unique-id-of-the-workspace"
+// Gitlab variables
+gitlab_url      = "https://gitlab.com"
+aud_value       = "https://gitlab.com"
+gitlab_match    = ["project_path:yourproject/*:ref_type:branch:ref:main"]
+gitlab_field    = "sub"
+
+// Github Variables
+github_match    = ["repo:yourorg/your-repo:*"]
+github_field    = "sub"
+
+// Bitbucket Variables
+bitbucket_workspace = "yourworkspace"
+bitbucket_workspaceid = "unique-workspace-id"
+
+// Unique Bootstrap Variables
+unique_prefix = "bedrock"
+base_region = "ap-southeast-2"

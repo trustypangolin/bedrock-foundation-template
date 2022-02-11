@@ -1,3 +1,12 @@
+variable "github_match" {
+  type = list(string)
+}
+
+variable "github_field" {
+  type    = string
+  default = "sub"
+}
+
 data "tls_certificate" "github" {
   url = "https://token.actions.githubusercontent.com"
 }
@@ -22,8 +31,8 @@ data "aws_iam_policy_document" "assume-role-policy-github" {
     }
     condition {
       test     = "StringLike"
-      variable = "${aws_iam_openid_connect_provider.github.url}:${var.match_field}"
-      values   = var.match_github
+      variable = "${aws_iam_openid_connect_provider.github.url}:${var.github_field}"
+      values   = var.github_match
     }
   }
 }
@@ -32,5 +41,39 @@ resource "aws_iam_role" "github_ci" {
   name                 = "Github-Bootstrap"
   assume_role_policy   = data.aws_iam_policy_document.assume-role-policy-github.json
   max_session_duration = 3600
+  inline_policy {
+    name   = "GithubAssume"
+    policy = data.aws_iam_policy_document.github_admin.json
+  }
 }
 
+data "aws_iam_policy_document" "github_admin" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+    resources = [
+      "arn:aws:iam::*:role/Github-*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "github_admin" {
+  name                 = "Github-Admin"
+  assume_role_policy   = data.aws_iam_policy_document.github_entry.json
+  managed_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  max_session_duration = 43200
+
+}
+
+data "aws_iam_policy_document" "github_entry" {
+  statement {
+    sid     = "AllowGithub"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.github_ci.arn]
+    }
+  }
+}

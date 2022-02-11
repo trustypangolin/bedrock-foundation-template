@@ -1,31 +1,10 @@
-variable "gitlab_url" {
-  type    = string
-  default = "https://gitlab.com"
+variable "base_region" {
+  type        = string
+  description = "AWS region to operate in. Defaults to ap-southeast-2 (Sydney)."
+  default     = "ap-southeast-2"
 }
 
-variable "aud_value" {
-  type    = string
-  default = "https://gitlab.com"
-}
-variable "match_field" {
-  type    = string
-  default = "aud"
-}
-variable "match_github" {
-  type = list(any)
-}
-
-variable "match_value" {
-  type = list(any)
-}
-
-variable "assume_role_arn" {
-  type = list(any)
-}
-variable "bitbucket_workspace" {
-  type = string
-}
-
-variable "bitbucket_workspaceid" {
-  type = string
+variable "unique_prefix" {
+  type        = string
+  description = "unique prefix used to be part of resource name"
 }
