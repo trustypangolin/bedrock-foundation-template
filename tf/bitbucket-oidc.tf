@@ -52,27 +52,7 @@ data "aws_iam_policy_document" "bitbucket_admin" {
       "sts:AssumeRole"
     ]
     resources = [
-      "arn:aws:iam::*:role/Bitbucket-*",
+      "arn:aws:iam::*:role/bedrock-deploy",
     ]
-  }
-}
-
-resource "aws_iam_role" "bitbucket_admin" {
-  name                 = "Bitbucket-Admin"
-  assume_role_policy   = data.aws_iam_policy_document.bitbucket_entry.json
-  managed_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
-  max_session_duration = 43200
-
-}
-
-data "aws_iam_policy_document" "bitbucket_entry" {
-  statement {
-    sid     = "AllowBitbucket"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.bitbucket_ci.arn]
-    }
   }
 }

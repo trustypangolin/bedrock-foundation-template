@@ -1,23 +1,5 @@
-// Run a terraform apply first, then uncomment this get optional remote state data values
-// data "terraform_remote_state" "mgmt" {
-//   backend = "s3"
-//   config = {
-//     bucket         = join("-", [
-//       var.customer_prefix,
-//       "tfstate"
-//       ])
-//     key            = "mgmt" 
-//     region         = "ap-southeast-2"
-//     dynamodb_table = "bedrock-tfstate"
-//   }
-// }
-
-// manually change this file to upload an org object to s3
-// this object will be used in the bedrock to reference actual account numbers
 terraform {
   backend "s3" {
-    // bucket      = "%unique_prefix%-tfstate"  # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="bucket=uniqueidentity-tfstate"
-    // key         = "mgmt"                     # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="key=envirnment"
     region         = "ap-southeast-2"
     dynamodb_table = "bedrock-tfstate"
   }

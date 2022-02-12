@@ -22,13 +22,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "log_bucket" {
 
 resource "aws_s3_bucket" "cur" {
   bucket = format("%s-cur", var.unique_prefix)
-  logging {
-    target_bucket = aws_s3_bucket.log_bucket.id
-    target_prefix = "log/"
-  }
   #checkov:skip=CKV_AWS_145:No Cross Account
   #checkov:skip=CKV_AWS_144:No Cross Region
   #checkov:skip=CKV_AWS_21:Versioning not required
+}
+
+resource "aws_s3_bucket_logging" "cur" {
+  bucket        = aws_s3_bucket.cur.id
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = "log/"
 }
 
 resource "aws_s3_bucket_acl" "cur" {

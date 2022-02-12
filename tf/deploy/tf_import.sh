@@ -1,4 +1,11 @@
 #!/bin/bash
+if [ -f credentials.env ];
+then
+  echo "Found Credentials, Importing"
+  export $(cat credentials.env | xargs)
+else
+  echo "Using Job defined credentials.env" 
+fi
 
 echo "Checking AWS for existing resources - Organization"
 echo orgid=$(aws organizations describe-organization | jq .Organization.Id | tr -d '"') > org.env
@@ -49,4 +56,3 @@ else
   echo -e "Importing dynamodb into state"
   terraform import aws_dynamodb_table.terraform $dynamodb
 fi
-cat org.env
