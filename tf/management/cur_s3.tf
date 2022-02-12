@@ -102,11 +102,9 @@ data "aws_iam_policy_document" "cur" {
       format("%s/*", aws_s3_bucket.cur.arn)
     ]
     condition {
-      test     = "aws:SecureTransport"
-      variable = "Bool"
-      values = [
-        "false"
-      ]
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
     }
   }
 }
@@ -137,3 +135,4 @@ resource "aws_s3_bucket_public_access_block" "log_bucket" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
