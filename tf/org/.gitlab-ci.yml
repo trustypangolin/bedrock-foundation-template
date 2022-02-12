@@ -4,25 +4,24 @@ stages:
   - terraform_plan
   - terraform_apply
 
-# Need AWS credentials and correct role setup for further jobs
-aws_account:
+# Need AWS credentials and a role to read the state
+aws_account_oidc:
   stage: aws_creds
   before_script:
     - cd tf/${ENVIRONMENT}
   script:
-    - ../deploy/aws_assumerole.sh
+    - ../deploy/aws_assumerole_oidc.sh
   artifacts:
     reports:
       dotenv: tf/${ENVIRONMENT}/credentials.env
-    paths:
-      - tf/${ENVIRONMENT}/token.json
 
+# # If this is the main branch, we have to make sure the Organisation state has all the correct values
 import_org:
   stage: terraform_import
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs:
-    - job: aws_account
+    - job: aws_account_oidc
       artifacts: true
   before_script:
     - cd tf/${ENVIRONMENT}
@@ -34,10 +33,11 @@ import_org:
       - ../deploy/tf_state.sh
       - ../deploy/tf_import.sh
 
+# Now run a plan. If this looks ok, keep going
 terraform_plan:
   stage: terraform_plan
   needs:
-    - job: aws_account
+    - job: aws_account_oidc
       artifacts: true
   before_script:
     - cd tf/${ENVIRONMENT}
@@ -52,13 +52,13 @@ terraform_plan:
     paths:
       - tf/${ENVIRONMENT}/plan
 
-# Only main branch will apply the IaC
+# Only default main branch will run the apply process
 terraform_apply:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   stage: terraform_apply
   needs:
-    - job: aws_account
+    - job: aws_account_oidc
       artifacts: true
   before_script:
     - cd tf/${ENVIRONMENT}

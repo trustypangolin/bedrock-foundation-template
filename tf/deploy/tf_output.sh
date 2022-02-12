@@ -7,4 +7,4 @@ else
   echo "Using Job defined credentials.env" 
 fi
 
-terraform apply --auto-approve
+terraform output -json > outputs.json

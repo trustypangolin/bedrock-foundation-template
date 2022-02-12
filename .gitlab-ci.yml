@@ -13,7 +13,8 @@ trigger_org:
         - tf/**/*
 
 trigger_management:
-  needs: ["trigger_org"]
+  needs: 
+    - trigger_org
   stage: triggers
   trigger:
     include: tf/management/.gitlab-ci.yml
@@ -24,7 +25,8 @@ trigger_management:
         - tf/management/*
 
 trigger_security:
-  needs: ["trigger_org"]
+  needs: 
+    - trigger_org
   stage: triggers
   trigger:
     include: tf/security/.gitlab-ci.yml

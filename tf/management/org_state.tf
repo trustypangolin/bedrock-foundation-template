@@ -9,3 +9,6 @@ data "terraform_remote_state" "org" {
   }
 }
 
+output "acc" {
+  value = lookup(data.terraform_remote_state.org.outputs.acc, "Management")
+}
