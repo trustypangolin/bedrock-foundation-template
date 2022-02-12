@@ -1,0 +1,56 @@
+name: TF Organisation
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - tf/org/**
+  pull_request:
+    paths:
+      - tf/org/**
+  workflow_dispatch:
+
+jobs:
+  authentication:
+    name: Authentication
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+# Github Actions method that replaces the aws_assumerole_oidc.sh deploy script
+      - name: AWS credentials Bootstrap
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ AWS_ROOT_ACCOUNT }}:role/Github-Bootstrap
+          aws-region: ap-southeast-2
+
+      - name: Export Session Credentials
+        id: bootstrap
+        run: |
+          if [ ! -f terraform.tfvars ]; then cat "$BEDROCK_TF_VARS" > "terraform.tfvars"; else echo "tfvars part of repo"; fi
+
+          echo "::set-output name=STSADMIN_RGN::$(cat terraform.tfvars | grep base_region | cut -d = -f2 | tr -d '[:blank:]\"')"
+          echo "::set-output name=STSADMIN_ID::$(echo $AWS_ACCESS_KEY_ID)"
+          echo "::set-output name=STSADMIN_KEY::$(echo $AWS_SECRET_ACCESS_KEY)"
+          echo "::set-output name=STSADMIN_TKN::$(echo $AWS_SESSION_TOKEN)"
+
+      - name: AWS credentials Admin
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.authentication.outputs.STSADMIN_ID }} 
+          aws-secret-access-key: ${{ steps.authentication.outputs.STSADMIN_KEY }}
+          aws-session-token: ${{ steps.authentication.outputs.STSADMIN_TKN }}
+          aws-region: ${{ steps.authentication.outputs.STSADMIN_RGN }}
+          role-to-assume: arn:aws:iam::${{ AWS_ROOT_ACCOUNT }}:role/bedrock-deploy
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+          role-session-name: MgmtAdminSession
+
+      - name: Test Creds
+        run: | 
+          aws s3 ls
+
