@@ -1,0 +1,11 @@
+provider "aws" {
+  region = "replace"
+  alias  = "replace"
+  default_tags {
+    tags = {
+      Service = "Bedrock",
+      Version = "3.0.0"
+    }
+  }
+}
+

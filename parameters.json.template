@@ -1,0 +1,66 @@
+[
+  {
+    "ParameterKey": "UniquePrefix",
+    "ParameterValue": "uniqueidentity"
+  },
+  {
+    "ParameterKey": "GitRepo",
+    "ParameterValue": "trustypangolin/aws-landing-zone"
+  },
+  {
+    "ParameterKey": "SSOInstanceArn",
+    "ParameterValue": "arn:aws:sso:::instance/ssoins-getfromssoarn"
+  },
+  {
+    "ParameterKey": "OperationalOUId",
+    "ParameterValue": "ou-xxxx-yyyyyyyy"
+  },
+  {
+    "ParameterKey": "BaseRegion",
+    "ParameterValue": "ap-southeast-2"
+  },
+  {
+    "ParameterKey": "ManagementAccountId",
+    "ParameterValue": "111111111111"
+  },
+  {
+    "ParameterKey": "SecurityAccountId",
+    "ParameterValue": "222222222222"
+  },
+  {
+    "ParameterKey": "SharedAccountId",
+    "ParameterValue": "333333333333"
+  },
+  {
+    "ParameterKey": "ProdAccountId",
+    "ParameterValue": "444444444444"
+  },
+  {
+    "ParameterKey": "BillingAccountBudget",
+    "ParameterValue": "10"
+  },
+  {
+    "ParameterKey": "SecurityAccountBudget",
+    "ParameterValue": "10"
+  },
+  {
+    "ParameterKey": "SharedAccountBudget",
+    "ParameterValue": "300"
+  },
+  {
+    "ParameterKey": "ProdAccountBudget",
+    "ParameterValue": "300"
+  },
+  {
+    "ParameterKey": "RecipientEmail",
+    "ParameterValue": "aws.root+bedrock.budgets@domain"
+  },
+  {
+    "ParameterKey": "OperationalEmail",
+    "ParameterValue": "aws.root+bedrock.operational@domain"
+  },
+  {
+    "ParameterKey": "SecurityEmail",
+    "ParameterValue": "aws.root+bedrock.security@domain"
+  }
+]

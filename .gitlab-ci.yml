@@ -1,0 +1,66 @@
+stages:
+  - triggers
+
+# All other directories need the Org to be fired off first to ensure the org state is upto date with outputs
+trigger_org:
+  stage: triggers
+  trigger:
+    include: tf/org/.gitlab-ci.yml
+  variables:
+    ENVIRONMENT: org
+  rules:
+    - changes:
+        - tf/**/*
+      if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+
+trigger_management:
+  needs:
+    - trigger_org
+  stage: triggers
+  trigger:
+    include: tf/management/.gitlab-ci.yml
+  variables:
+    ENVIRONMENT: management
+  rules:
+    - changes:
+        - tf/management/*
+      if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+
+trigger_security:
+  needs:
+    - trigger_org
+  stage: triggers
+  trigger:
+    include: tf/security/.gitlab-ci.yml
+  variables:
+    ENVIRONMENT: security
+  rules:
+    - changes:
+        - tf/security/*
+      if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+
+trigger_shared:
+  needs:
+    - trigger_org
+  stage: triggers
+  trigger:
+    include: tf/shared/.gitlab-ci.yml
+  variables:
+    ENVIRONMENT: shared
+  rules:
+    - changes:
+        - tf/shared/*
+      if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
+
+trigger_production:
+  needs:
+    - trigger_org
+  stage: triggers
+  trigger:
+    include: tf/production/.gitlab-ci.yml
+  variables:
+    ENVIRONMENT: production
+  rules:
+    - changes:
+        - tf/production/*
+      if: '$CI_PIPELINE_SOURCE != "merge_request_event"'

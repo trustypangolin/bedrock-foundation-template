@@ -1,0 +1,19 @@
+{
+  "name": {
+    "S": "AU-SYD-ClosingHours"
+  },
+  "type": {
+    "S": "schedule"
+  },
+  "timezone": {
+    "S": "Australia/Sydney"
+  },
+  "description": {
+    "S": "Stop Only Time"
+  },
+  "periods": {
+    "SS": [
+      "always-stop"
+    ]
+  }
+}

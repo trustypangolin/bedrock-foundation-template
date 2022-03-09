@@ -1,0 +1,15 @@
+# Store this as Base64 format in GitHub/GitLab/BitBucket as BEDROCK_TF_VARS
+
+// Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
+unique_prefix = "uniqueidentity"  
+
+// These variables are common and defaults, but can be changed if required
+base_region = "ap-southeast-2"
+
+// Org Values
+root_emails = {
+  "Management" = "aws+bedrock.mgmt@domain.abc"
+  "Security"   = "aws+bedrock.sec@domain.abc"
+  "Shared"     = "aws+bedrock.shared@domain.abc"
+  "Production" = "aws+bedrock.prod@domain.abc"
+}

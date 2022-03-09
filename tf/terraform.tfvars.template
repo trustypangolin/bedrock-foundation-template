@@ -1,0 +1,20 @@
+// Gitlab variables
+gitlab          = true
+gitlab_url      = "https://gitlab.com"
+gitlab_aud      = "https://gitlab.com"
+gitlab_match    = ["project_path:yourproject/*:ref_type:branch:ref:*"]
+gitlab_field    = "sub"
+
+// Github Variables
+github          = true
+github_match    = ["repo:yourorg/your-repo:*"]
+github_field    = "sub"
+
+// Bitbucket Variables
+bitbucket             = true
+bitbucket_workspace   = "yourworkspace"
+bitbucket_workspaceid = "unique-workspace-id"
+
+// Unique Bootstrap Variables
+unique_prefix = "unique_prefix"
+base_region   = "ap-southeast-2"

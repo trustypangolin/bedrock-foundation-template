@@ -1,0 +1,6 @@
+{
+  "description": { "S": "Days in weekend"},
+  "name": {"S": "weekends"},
+  "type": {"S": "period"},
+  "weekdays": {"SS": ["sat-sun"]}
+}

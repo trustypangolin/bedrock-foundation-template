@@ -1,0 +1,13 @@
+// Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
+unique_prefix    = "uniqueidentity"  
+
+// These variables are common and defaults, but can be changed if required
+base_region = "ap-southeast-2"
+
+notifications = {
+  billing    = "aws+bedrock.billing@domain.abc"
+  operations = "aws+bedrock.operations@@domain.abc"
+  security   = "aws+bedrock.security@@domain.abc"
+}
+
+grafana_id = "111111"

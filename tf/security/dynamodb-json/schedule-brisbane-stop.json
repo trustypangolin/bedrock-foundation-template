@@ -1,0 +1,19 @@
+{
+  "name": {
+    "S": "AU-BNE-ClosingHours"
+  },
+  "type": {
+    "S": "schedule"
+  },
+  "timezone": {
+    "S": "Australia/Brisbane"
+  },
+  "description": {
+    "S": "Stop Only Time"
+  },
+  "periods": {
+    "SS": [
+      "always-stop"
+    ]
+  }
+}

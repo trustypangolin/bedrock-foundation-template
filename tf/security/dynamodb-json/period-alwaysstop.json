@@ -1,0 +1,7 @@
+{
+  "description": {"S": "End Time"},
+  "endtime": {"S": "17:00"},
+  "name": {"S": "always-stop"},
+  "type": {"S": "period"},
+  "weekdays": {"SS": ["mon-sun"]}
+}

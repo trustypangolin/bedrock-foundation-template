@@ -1,0 +1,8 @@
+{
+  "begintime": {"S": "08:00"},
+  "description": {"S": "Office hours"},
+  "endtime": {"S": "18:00"},
+  "name": {"S": "office-hours"},
+  "type": {"S": "period"},
+  "weekdays": {"SS": ["mon-fri"]}
+}

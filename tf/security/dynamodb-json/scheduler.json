@@ -1,0 +1,14 @@
+{
+  "create_rds_snapshot": {"BOOL": false},
+  "default_timezone": {"S": "Australia/Brisbane"},
+  "enable_SSM_maintenance_windows": {"BOOL": false},
+  "name": {"S": "scheduler"},
+  "regions": {"SS": ["ap-southeast-1","ap-southeast-2"]},
+  "schedule_clusters": {"BOOL": true},
+  "schedule_lambda_account": {"BOOL": true},
+  "scheduled_services": {"SS": ["ec2","rds"]},
+  "tagname": {"S": "Schedule"},
+  "trace": {"BOOL": false},
+  "type": {"S": "config"},
+  "use_metrics": {"BOOL": false}
+}

@@ -1,0 +1,83 @@
+name: Terraform Workflow
+on:
+  workflow_call:
+    inputs:
+      account:
+        required: true
+        type: string
+    secrets:
+      AWS_ROOT_ACCOUNT:
+        required: true
+      BEDROCK_TF_VARS:
+        required: true
+      BEDROCK_TF_STATE:
+        required: true
+
+jobs:
+  authentication:
+    name: Terraform
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    defaults:
+      run:
+        working-directory: ./tf/${{ inputs.account }}
+    env:
+      account: ${{ inputs.account }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+# Github Actions method that replaces the aws_assumerole_oidc.sh deploy script
+      - name: AWS credentials Bootstrap
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ROOT_ACCOUNT }}:role/Github-Bootstrap
+          aws-region: ap-southeast-2
+
+      - name: Export Session Credentials
+        id: bootstrap
+        run: |
+          if [ ! -f terraform.tfvars ]; then echo '${{ secrets.BEDROCK_TF_VARS }}' > "terraform.tfvars"; else echo "tfvars part of repo"; fi
+          RGN="$(cat terraform.tfvars | grep base_region | cut -d = -f2 | tr -d '[:blank:]\"')"
+
+          echo "::set-output name=STS_RGN::$RGN"
+          echo "::set-output name=STS_ID::$AWS_ACCESS_KEY_ID"
+          echo "::set-output name=STS_KEY::$AWS_SECRET_ACCESS_KEY"
+          echo "::set-output name=STS_TKN::$AWS_SESSION_TOKEN"
+
+      - name: AWS credentials Admin
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ steps.bootstrap.outputs.STS_ID }} 
+          aws-secret-access-key: ${{ steps.bootstrap.outputs.STS_KEY }}
+          aws-session-token: ${{ steps.bootstrap.outputs.STS_TKN }}
+          aws-region: ${{ steps.bootstrap.outputs.STS_RGN }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ROOT_ACCOUNT }}:role/bedrock-deploy
+          role-skip-session-tagging: true
+          role-duration-seconds: 3600
+          role-session-name: MgmtAdminSession
+
+      - name: Generate Artifacts from Secrets, Maintain Compatibility with GitLab
+        run: |
+          echo '${{ secrets.BEDROCK_TF_VARS }}' > terraform.tfvars
+          echo '${{ secrets.BEDROCK_TF_STATE }}' > remote_state.tf
+
+      - name: Terraform State and Init
+        env:
+          ENVIRONMENT: ${{ env.account }}
+        run: |
+          ../deploy/tf_state.sh
+
+      - name: Terraform Import (Org Account Only)
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && env.account == 'org'
+        run: ../deploy/tf_import.sh
+
+      - name: Terraform Plan
+        run: ../deploy/tf_plan.sh
+
+      - name: Terraform Apply
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: ../deploy/tf_deploy.sh
