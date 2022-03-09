@@ -1,0 +1,73 @@
+stages:
+  - aws_creds
+  - terraform_import
+  - terraform_plan
+  - terraform_apply
+
+# Need AWS credentials and a role to read the state
+aws_account_oidc:
+  stage: aws_creds
+  before_script:
+    - cd tf/${ENVIRONMENT}
+  script:
+    - ../deploy/aws_assumerole_oidc.sh
+  artifacts:
+    reports:
+      dotenv: tf/${ENVIRONMENT}/credentials.env
+
+# If this is the main branch, we have to make sure the SLR state has all the correct values
+import_existing:
+  stage: terraform_import
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs:
+    - job: aws_account_oidc
+      artifacts: true
+  before_script:
+    - cd tf/${ENVIRONMENT}
+  cache:
+    key: terraform
+    paths:
+      - tf/${ENVIRONMENT}/.terraform
+  script:
+      - ../deploy/tf_state.sh
+      - ../deploy/tf_import_slr.sh
+
+# Now run a plan. If this looks ok, keep going
+terraform_plan:
+  stage: terraform_plan
+  needs:
+    - job: aws_account_oidc
+      artifacts: true
+  before_script:
+    - cd tf/${ENVIRONMENT}
+  cache:
+    key: terraform
+    paths:
+      - tf/${ENVIRONMENT}/.terraform
+  script:
+    - ../deploy/tf_state.sh
+    - ../deploy/tf_plan.sh
+  artifacts:
+    paths:
+      - tf/${ENVIRONMENT}/plan
+
+# Only default main branch will run the apply process
+terraform_apply:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  stage: terraform_apply
+  needs:
+    - job: aws_account_oidc
+      artifacts: true
+    - job: import_existing
+    - job: terraform_plan
+  before_script:
+    - cd tf/${ENVIRONMENT}
+  cache:
+    key: terraform
+    paths:
+      - tf/${ENVIRONMENT}/.terraform
+  script:
+    - ../deploy/tf_state.sh
+    - ../deploy/tf_deploy.sh

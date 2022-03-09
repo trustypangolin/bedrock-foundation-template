@@ -1,0 +1,19 @@
+{
+  "name": {
+    "S": "AU-BNE-OfficeHours"
+  },
+  "type": {
+    "S": "schedule"
+  },
+  "timezone": {
+    "S": "Australia/Brisbane"
+  },
+  "description": {
+    "S": "Office hours in Brisbane"
+  },
+  "periods": {
+    "SS": [
+      "office-hours"
+    ]
+  }
+}

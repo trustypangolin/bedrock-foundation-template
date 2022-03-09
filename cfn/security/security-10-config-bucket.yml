@@ -1,0 +1,457 @@
+---
+#====================================================================================================
+# Description : Creates an S3 bucket to be used for AWS Config Logs
+# Author      : 
+# Date        : 2022-03-04
+# Version     : 1.0.0
+# Deployment  : Single Region that the S3 Bucket that need to be deployed in
+# Prerequisite: security-01-kms.yml for the existing Security KMS key Exports
+# Command Line:
+# aws cloudformation --profile %UNIQUEPREFIX%-security-admin \
+#                    deploy \
+#                    --stack-name bedrock-config-security-config-bucket \
+#                    --template-file ./cfn/security/security-10-config-bucket.yml \
+#                    --capabilities CAPABILITY_NAMED_IAM \
+#                    --tags Service=Bedrock Version=1.0.0 Environment=Security
+#====================================================================================================
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS Config - Bucket - Security Account (need to manually execute lambda if adding new accounts)"
+#====================================================================================================
+#                                             Parameters
+#====================================================================================================
+Parameters:
+  UniquePrefix:
+    Default: "%UNIQUEPREFIX%"
+    Description: "The prefix to be used at the beginning of the S3 Bucket"
+    Type: String
+  #--------------------------------------------------------------------------------------------------
+  ManagementAccountId:
+    # Default: "%MANAGEMENTACCOUNT%"
+    Description: "The management billing account ID"
+    Type: String
+    AllowedPattern: '^\d{12}$'
+  #--------------------------------------------------------------------------------------------------
+  RetentionPeriod:
+    Default: 90
+    Description: "Retention Period in Days"
+    Type: String
+    AllowedValues: [7, 31, 90, 180, 365, 2555]
+#====================================================================================================
+#                                             Resources
+#====================================================================================================
+Resources:
+  #--------------------------------------------------------------------------------------------------
+  # Configures the S3 Bucket to be used for AWS Config Logs
+  #--------------------------------------------------------------------------------------------------
+  ConfigBucket:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${UniquePrefix}-config"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID:
+                Fn::ImportValue: !Sub "${UniquePrefix}-security-kms-key-arn"
+            BucketKeyEnabled: true
+      LoggingConfiguration:
+        DestinationBucketName:
+          Fn::ImportValue: !Sub "${UniquePrefix}-security-logging-access-logs-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            Id: Remove Old Recordings
+            ExpirationInDays: !Ref RetentionPeriod
+      Tags:
+        - Key: Version
+          Value: 1.0.0
+        - Key: Service
+          Value: Bedrock
+        - Key: Environment
+          Value: Security
+
+  #--------------------------------------------------------------------------------------------------
+  # Configures the IAM role for the Lambda function
+  #--------------------------------------------------------------------------------------------------
+  ConfigPolicyGeneratorRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: "Bedrock-ConfigPolicyGeneratorRole"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: LambdaAssumeRole
+            Effect: Allow
+            Principal:
+              Service: "lambda.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "allow-assume-OrganizationsListAccountsRole"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: allowassumeOrganizationsListAccountsRole
+                Effect: Allow
+                Action: "sts:AssumeRole"
+                Resource: !Sub "arn:aws:iam::${ManagementAccountId}:role/OrganizationsListAccountsRole"
+              - Sid: allowcloudtrails3put
+                Effect: Allow
+                Action:
+                  - "s3:PutBucketPolicy"
+                  - "s3:GetBucketPolicy"
+                Resource: !GetAtt ConfigBucket.Arn
+              - Sid: allowkmskeypolicy
+                Effect: Allow
+                Action:
+                  - "kms:PutKeyPolicy"
+                  - "kms:GetKeyPolicy"
+                Resource:
+                  Fn::ImportValue: !Sub "${UniquePrefix}-security-kms-key-arn"
+              - Sid: allowlambdadeadlettersns
+                Effect: Allow
+                Action:
+                  - "sns:Publish"
+                Resource: "arn:aws:sns:*:*:bedrock-security-deadletter"
+              - Sid: allowlambdalogwrite
+                Effect: Allow
+                Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource: "arn:aws:logs:*:*:*"
+      Tags:
+        - Key: Version
+          Value: 1.0.0
+        - Key: Service
+          Value: Bedrock
+        - Key: Environment
+          Value: Security
+
+  #--------------------------------------------------------------------------------------------------
+  # Create the ConfigKMSPolicyGenerator Lambda Function
+  #--------------------------------------------------------------------------------------------------
+  ConfigKMSPolicyGenerator:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: Bedrock-ConfigKMSPolicyGenerator
+      Description: Dynamically generates the AWS Config KMS Policy
+      DeadLetterConfig:
+        TargetArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:bedrock-security-deadletter
+      Environment:
+        Variables:
+          KMSKeyID:
+            Fn::ImportValue: !Sub "${UniquePrefix}-security-kms-key-arn"
+          RoleArn: !Sub "arn:aws:iam::${ManagementAccountId}:role/OrganizationsListAccountsRole"
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt ConfigPolicyGeneratorRole.Arn
+      Runtime: python3.8
+      Timeout: 30
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import os
+          import cfnresponse
+
+          roleArn = os.environ['RoleArn']
+          kmsKeyID = os.environ['KMSKeyID']
+
+          client = boto3.client('sts')
+          response = client.assume_role(RoleArn=roleArn, RoleSessionName='OrganizationsAccess')
+          orgSession = boto3.Session(
+              aws_access_key_id=response['Credentials']['AccessKeyId'],
+              aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+              aws_session_token=response['Credentials']['SessionToken']
+          )
+
+          orgs = orgSession.client('organizations')
+          accounts = orgs.list_accounts()['Accounts']
+
+          kms = boto3.client('kms')
+
+
+          def sid_hunt(j, sid):
+              i = 0
+              for policy in j['Statement']:
+                  if 'Sid' in policy:
+                      if sid in policy['Sid']:
+                          return i
+                  i = i+1
+              return -1
+
+
+          def kms_config(event, context):
+              r = kms.get_key_policy(KeyId=kmsKeyID, PolicyName='default')
+              r = json.loads(r['Policy'])
+
+              kms_config_policy1 = \
+                  {
+                      "Sid": "AWSConfigKMSPolicy",
+                      "Effect": "Allow",
+                      "Principal": {
+                          "Service": "config.amazonaws.com"
+                      },
+                      "Action": [
+                          "kms:Decrypt",
+                          "kms:GenerateDataKey"
+                      ],
+                      "Resource": f"{kmsKeyID}"
+                  }
+
+              kms_config_policy2 = \
+                  {
+                      "Sid": "AWSConfigKMSPolicyIAMRole",
+                      "Action": [
+                          "kms:Decrypt",
+                          "kms:GenerateDataKey"
+                      ],
+                      "Effect": "Allow",
+                      "Resource": f"{kmsKeyID}",
+                      "Principal": {
+                          "AWS": []
+                      }
+                  }
+
+              p1 = sid_hunt(r, 'AWSConfigKMSPolicy')
+              if p1 >= 0:
+                  print('Replacing KMS Service Role Config Policy 1:', kmsKeyID)
+                  r['Statement'].pop(p1)
+
+              p2 = sid_hunt(r, 'AWSConfigKMSPolicyIAMRole')
+              if p2 >= 0:
+                  print('Replacing KMS IAM Role Config Policy 2:', kmsKeyID)
+                  r['Statement'].pop(p2)
+
+              for account in accounts:
+                  kms_config_policy2['Principal']['AWS'].append(f'{account["Id"]}')
+
+              r['Statement'].append(kms_config_policy1)
+              r['Statement'].append(kms_config_policy2)
+
+              r = json.dumps(r)
+              kmso = kms.put_key_policy(KeyId=kmsKeyID, PolicyName='default', Policy=r)
+
+              responseData = {}
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, '')
+
+
+          def lambda_handler(event, context):
+              kms_config(event, context)
+      Tags:
+        - Key: Version
+          Value: 1.0.0
+        - Key: Service
+          Value: Bedrock
+        - Key: Environment
+          Value: Security
+
+  #--------------------------------------------------------------------------------------------------
+  # Create the ConfigS3PolicyGenerator Lambda Function
+  #--------------------------------------------------------------------------------------------------
+  ConfigS3PolicyGenerator:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: Bedrock-ConfigS3PolicyGenerator
+      Description: Dynamically generates the AWS Config S3 Bucket Policy
+      DeadLetterConfig:
+        TargetArn: !Sub arn:aws:sns:${AWS::Region}:${AWS::AccountId}:bedrock-security-deadletter
+      Environment:
+        Variables:
+          BucketName: !Ref ConfigBucket
+          RoleArn: !Sub "arn:aws:iam::${ManagementAccountId}:role/OrganizationsListAccountsRole"
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt ConfigPolicyGeneratorRole.Arn
+      Runtime: python3.8
+      Timeout: 30
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import os
+          import cfnresponse
+
+          roleArn = os.environ['RoleArn']
+
+          client = boto3.client('sts')
+          response = client.assume_role(RoleArn=roleArn, RoleSessionName='OrganizationsAccess')
+          orgSession = boto3.Session(
+              aws_access_key_id=response['Credentials']['AccessKeyId'],
+              aws_secret_access_key=response['Credentials']['SecretAccessKey'],
+              aws_session_token=response['Credentials']['SessionToken']
+          )
+
+          orgs = orgSession.client('organizations')
+          accounts = orgs.list_accounts()['Accounts']
+          s3BucketName = os.environ['BucketName']
+
+          s3 = boto3.resource('s3')
+          client = boto3.client('s3')
+
+
+          def sid_hunt(j, sid):
+              i = 0
+              for policy in j['Statement']:
+                  if 'Sid' in policy:
+                      if sid in policy['Sid']:
+                          return i
+                  i = i+1
+              return -1
+
+
+          def s3_resolver(event, context):
+              policy_block = {"Version": "2012-10-17", "Statement": []}
+              try:
+                  s = client.get_bucket_policy(Bucket=s3BucketName)
+                  s = json.loads(s['Policy'])
+              except:
+                  s = policy_block
+
+              config_policy1 = \
+                  {
+                      "Sid": "AWSConfigBucketPermissionsCheck",
+                      "Effect": "Allow",
+                      "Principal": {
+                          "Service": [
+                              "config.amazonaws.com"
+                          ]
+                      },
+                      "Action": "s3:GetBucketAcl",
+                      "Resource": f'arn:aws:s3:::{s3BucketName}'
+                  }
+
+              config_policy2 = \
+                  {
+                      "Sid": "AWSConfigBucketExistenceCheck",
+                      "Effect": "Allow",
+                      "Principal": {
+                      "Service": [
+                          "config.amazonaws.com"
+                      ]
+                      },
+                      "Action": "s3:ListBucket",
+                      "Resource": f"arn:aws:s3:::{s3BucketName}"
+                  }
+
+              config_policy3 = \
+                  {
+                      "Sid": "AWSConfigBucketDelivery",
+                      "Effect": "Allow",
+                      "Principal": {
+                          "Service": [
+                              "config.amazonaws.com"
+                          ]
+                      },
+                      "Action": [
+                          "s3:PutObject"
+                      ],
+                      "Resource": [],
+                      "Condition": {
+                          "StringEquals": {
+                              "s3:x-amz-acl": "bucket-owner-full-control"
+                          }
+                      }
+                  }
+
+              for account in accounts:
+                  config_policy3['Resource'].append(f'arn:aws:s3:::{s3BucketName}/AWSLogs/{account["Id"]}/Config/*')
+
+              p1 = sid_hunt(s, 'AWSConfigBucketPermissionsCheck')
+              if p1 >= 0:
+                  print('Replacing S3 Config Policy 1:', s3BucketName)
+                  s['Statement'].pop(p1)
+
+              p2 = sid_hunt(s, 'AWSConfigBucketExistenceCheck')
+              if p2 >= 0:
+                  print('Replacing S3 Config Policy 2:', s3BucketName)
+                  s['Statement'].pop(p2)
+
+              p3 = sid_hunt(s, 'AWSConfigBucketDelivery')
+              if p3 >= 0:
+                  print('Replacing S3 Config Policy 3:', s3BucketName)
+                  s['Statement'].pop(p3)
+
+              s['Statement'].append(config_policy1)
+              s['Statement'].append(config_policy2)
+              s['Statement'].append(config_policy3)
+              s = json.dumps(s)
+
+              bucketo = client.put_bucket_policy(Bucket=s3BucketName, Policy=s)
+
+              responseData = {}
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData, '')
+
+
+          def lambda_handler(event, context):
+              s3_resolver(event, context)
+      Tags:
+        - Key: Version
+          Value: 1.0.0
+        - Key: Service
+          Value: Bedrock
+        - Key: Environment
+          Value: Security
+
+  #--------------------------------------------------------------------------------------------------
+  # Execute the lambda function
+  #--------------------------------------------------------------------------------------------------
+  InvokeConfigKMSPolicyGenerator:
+    Type: Custom::InvokeConfigKMSPolicyGenerator
+    DependsOn:
+      - ConfigPolicyGeneratorRole
+      - LambdaLogGroupKMS
+    Properties:
+      ServiceToken: !GetAtt ConfigKMSPolicyGenerator.Arn
+
+  InvokeConfigS3PolicyGenerator:
+    Type: Custom::InvokeConfigS3PolicyGenerator
+    DependsOn:
+      - ConfigPolicyGeneratorRole
+      - LambdaLogGroupS3
+    Properties:
+      ServiceToken: !GetAtt ConfigS3PolicyGenerator.Arn
+
+  LambdaLogGroupKMS:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - "/aws/lambda/"
+            - !Ref ConfigKMSPolicyGenerator
+      RetentionInDays: 3
+
+  LambdaLogGroupS3:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+          - ""
+          - - "/aws/lambda/"
+            - !Ref ConfigS3PolicyGenerator
+      RetentionInDays: 3
+
+#====================================================================================================
+#                                             Outputs
+#====================================================================================================
+Outputs:
+  #--------------------------------------------------------------------------------------------------
+  ConfigBucketName:
+    Description: The S3 Bucket Name for Config
+    Value: !Ref ConfigBucket
+    Export:
+      Name: !Sub "${UniquePrefix}-config-bucket"
+  #--------------------------------------------------------------------------------------------------
+  ConfigBucketArn:
+    Description: The S3 Bucket Arn for Config
+    Value: !GetAtt ConfigBucket.Arn
+    Export:
+      Name: !Sub "${UniquePrefix}-config-bucket-Arn"

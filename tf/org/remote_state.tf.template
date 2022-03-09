@@ -1,0 +1,15 @@
+terraform {
+  backend "s3" {
+    dynamodb_table = "bedrock-tfstate"
+    workspace_key_prefix = "multiorg"
+  }
+}
+
+# terraform init                                  \
+# -backend-config="bucket=%uniqueprefix%-tfstate" \
+# -backend-config="key=bedrock/org"               \
+# -backend-config="region=ap-southeast-2"         \
+# -reconfigure
+
+# SECRET for BEDROCK_TF_STATE 
+# awk 'NF && ! /#/' remote_state.tf | base64

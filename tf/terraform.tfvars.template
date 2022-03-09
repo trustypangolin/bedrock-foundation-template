@@ -1,0 +1,29 @@
+# Source Account
+source_account = 999999999999
+
+# Gitlab variables
+gitlab_role  = true
+gitlab_idp   = true
+gitlab_url   = "https://gitlab.com"
+gitlab_aud   = "https://gitlab.com"
+gitlab_match = ["project_path:yourproject/*:ref_type:branch:ref:*"]
+gitlab_field = "sub"
+
+# Github Variables
+github_role  = true
+github_idp   = true
+github_match = ["repo:yourorg/your-repo:*"]
+github_field = "sub"
+
+# Bitbucket Variables
+bitbucket_role        = true
+bitbucket_idp         = true
+bitbucket_workspace   = "yourworkspace"
+bitbucket_workspaceid = "unique-workspace-id"
+
+# Unique Bootstrap Variables
+unique_prefix = "uniqueprefix"
+base_region   = "ap-southeast-2"
+
+# SECRET for BEDROCK_TF_VARS 
+# awk 'NF && ! /#/' terraform.tfvars | base64

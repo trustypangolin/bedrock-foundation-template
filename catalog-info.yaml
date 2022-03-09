@@ -1,0 +1,20 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: bedrock-foundation-template
+  title: AWS Terraform Landing Zone
+  description: Terraform Landing Zone for AWS
+  annotations:
+    backstage.io/source-location: url:https://gitlab.com/trustypangolin/bedrock-foundation-template/
+    backstage.io/techdocs-ref: url:https://gitlab.com/trustypangolin/bedrock-foundation-template/tree/main/docs
+    github.com/project-slug: trustypangolin/bedrock-foundation-template
+  tags:
+    - terraform
+    - aws
+    - github
+    - gitlab
+    - bitbucket
+spec:
+  type: documentation
+  lifecycle: production
+  owner: trustypangolin

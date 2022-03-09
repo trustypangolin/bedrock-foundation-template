@@ -1,0 +1,5 @@
+
+grafana_id = "111111"
+
+# SECRET for BEDROCK_TF_VARS 
+# awk 'NF && ! /#/' terraform.tfvars | base64

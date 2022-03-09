@@ -1,0 +1,137 @@
+image: atlassian/default-image:3
+
+pipelines:
+  default:
+    - step:
+        name: Initialise AWS credentials and Terraform Variables
+        oidc: true
+        max-time: 5
+        script:
+          - ./tf/deploy/ubuntu_base.sh
+          - ./tf/deploy/aws_assumerole_oidc.sh
+        artifacts:
+          - securecreds.enc
+        condition:
+          changesets:
+            includePaths:
+              - "tf/org/*"
+              - "tf/management/*"
+              - "tf/security/*"
+
+    - step:
+        name: Terraform Organisation
+        max-time: 5
+        condition:
+          changesets:
+            includePaths:
+              - "tf/org/*"
+        script:
+          - cd ./tf/org
+          - export ENVIRONMENT=org
+          - ../deploy/ubuntu_base.sh
+          - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+          - export $(cat credentials.env | xargs)
+          - ../deploy/tf_state.sh
+          - ../deploy/tf_plan.sh
+
+    - step:
+        name: Terraform Management
+        max-time: 5
+        condition:
+          changesets:
+            includePaths:
+              - "tf/management/*"
+        script:
+          - cd ./tf/management
+          - export ENVIRONMENT=management
+          - ../deploy/ubuntu_base.sh
+          - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+          - export $(cat credentials.env | xargs)
+          - ../deploy/tf_state.sh
+          - ../deploy/tf_plan.sh
+
+    - step:
+        name: Terraform Security
+        max-time: 5
+        condition:
+          changesets:
+            includePaths:
+              - "tf/security/*"
+        script:
+          - cd ./tf/security
+          - export ENVIRONMENT=security
+          - ../deploy/ubuntu_base.sh
+          - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+          - export $(cat credentials.env | xargs)
+          - ../deploy/tf_state.sh
+          - ../deploy/tf_plan.sh
+
+  branches:
+    main:
+      - step:
+          name: Initialise AWS credentials and Terraform Variables
+          oidc: true
+          max-time: 5
+          script:
+            - ./tf/deploy/ubuntu_base.sh
+            - ./tf/deploy/aws_assumerole_oidc.sh
+          artifacts:
+            - securecreds.enc
+          condition:
+            changesets:
+              includePaths:
+                - "tf/org/*"
+                - "tf/management/*"
+                - "tf/security/*"
+
+      - step:
+          name: Terraform Organisation
+          max-time: 5
+          condition:
+            changesets:
+              includePaths:
+                - "tf/org/*"
+          script:
+            - cd ./tf/org
+            - export ENVIRONMENT=org
+            - ../deploy/ubuntu_base.sh
+            - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+            - export $(cat credentials.env | xargs)
+            - ../deploy/tf_state.sh
+            - ../deploy/tf_import.sh
+            - ../deploy/tf_plan.sh
+            - ../deploy/tf_deploy.sh
+
+      - step:
+          name: Terraform Management
+          max-time: 5
+          condition:
+            changesets:
+              includePaths:
+                - "tf/management/*"
+          script:
+            - cd ./tf/management
+            - export ENVIRONMENT=management
+            - ../deploy/ubuntu_base.sh
+            - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+            - export $(cat credentials.env | xargs)
+            - ../deploy/tf_state.sh
+            - ../deploy/tf_plan.sh
+            - ../deploy/tf_deploy.sh
+
+      - step:
+          name: Terraform Security
+          max-time: 5
+          condition:
+            changesets:
+              includePaths:
+                - "tf/security/*"
+          script:
+            - cd ./tf/security
+            - export ENVIRONMENT=security
+            - ../deploy/ubuntu_base.sh
+            - openssl enc -d -aes-256-cbc -pbkdf2 -base64 -k ${ENCKEY} -in ../../securecreds.enc -out credentials.env 
+            - export $(cat credentials.env | xargs)
+            - ../deploy/tf_state.sh
+            - ../deploy/tf_plan.sh
+            - ../deploy/tf_deploy.sh

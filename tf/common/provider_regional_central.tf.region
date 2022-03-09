@@ -1,0 +1,14 @@
+provider "aws" {
+  region = "replace"
+  alias  = "replace"
+  assume_role {
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", local.central)
+    session_name = "terraform"
+  }
+  default_tags {
+    tags = {
+      Service = "Bedrock",
+      Version = "3.0.0"
+    }
+  }
+}

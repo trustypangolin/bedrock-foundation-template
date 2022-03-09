@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#controls {
+  /* display: block;
+  overflow-x: auto;
+  white-space: nowrap; */
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#controls td, #controls th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#controls tr:nth-child(even){background-color: #f2f2f2;}
+
+#controls tr:hover {background-color: #ddd;}
+
+#controls th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #202261;
+  color: white;
+}
+
+#first {
+  border-left: none;
+  width: 15em;
+  min-width: 15em;
+  max-width: 15em;
+}
+
+#sub1 td {
+  background-color: #8183b1;
+}
+
+#sub2 td {
+  background-color: #afb1db;
+}
+
+
+</style>
+</head>
+<body>
+
+
+<table id="controls">
+  <tr>
+      <th>Chapter</th>
+      <th>Control</th>
+      <th>Landing Zone Scope</th>
+      <th>AWS Control</th>
+      <th>Customer Scope</th>
+      <th>Customer Control</th>
+  </tr>
+
+  <tr id="sub1">
+      <td >5</td>
+      <td>Information security policies</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>5.1</td>
+      <td>Management direction for information security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>5.1.1</td>
+      <td>Policies for information security</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must implement this policy</td>
+  </tr>
+  <tr>
+      <td>5.1.2</td>
+      <td>Review of the policies for information security</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must ensure the policy is continually renewed</td>
+  </tr>
+  <tr id="sub1">
+      <td>6</td>
+      <td>Organization of information security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>6.1</td>
+      <td>Internal organization</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>6.1.1</td>
+      <td>Information security roles and responsibilities</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must define information security roles and responsibilities. Technical measures are secondary.</td>
+  </tr>
+  <tr>
+      <td>6.1.2</td>
+      <td>Segregation of duties</td>
+      <td>✔</td>
+      <td>IAM roles have been configured.  Customer needs to ensure Roles are applied to named user accounts only.</td>
+      <td>✔</td>
+      <td>Customer must ensure segregation of duties. Proves difficult for smaller organisations. Technical measures are secondary.</td>
+  </tr>
+  <tr>
+      <td>6.1.3</td>
+      <td>Contact with authorities</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must identify authorities to whom they must report, and develop procedures for reporting information security incidents to these authorities</td>
+  </tr>
+  <tr>
+      <td>6.1.4</td>
+      <td>Contact with special interest groups</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must identify their special interest groups, and maintain contact</td>
+  </tr>
+  <tr>
+      <td>6.1.5</td>
+      <td>Information security in project management</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>xx addresses information security in every project. Customer must ensure that all projects address information security.</td>
+  </tr>
+  <tr id="sub2">
+      <td>6.2</td>
+      <td>Mobile devices and teleworking</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>6.2.1</td>
+      <td>Mobile device policy</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop a mobile device policy</td>
+  </tr>
+  <tr>
+      <td>6.2.2</td>
+      <td>Teleworking</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop a teleworking policy</td>
+  </tr>
+  <tr id="sub1">
+      <td>7</td>
+      <td>Human resource security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>7.1</td>
+      <td>Prior to employment</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>7.1.1</td>
+      <td>Screening</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must perform background checks</td>
+  </tr>
+  <tr>
+      <td>7.1.2</td>
+      <td>Terms and conditions of employment</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must ensure contractual agreements with employees and contractors state responsibilities for information security</td>
+  </tr>
+  <tr id="sub2">
+      <td>7.2</td>
+      <td>During employment</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>7.2.1</td>
+      <td>Management responsibilities</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must ensure management requires employees and contractors apply information security, as per the organisation's policy and procedures</td>
+  </tr>
+  <tr>
+      <td>7.2.2</td>
+      <td>Information security awareness, education and training</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must ensure appropriate information security training for contractors and employees</td>
+  </tr>
+  <tr>
+      <td>7.2.3</td>
+      <td>Disciplinary process</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must implement a disciplinary process for employees who have committed an information security breach</td>
+  </tr>
+  <tr id="sub2">
+      <td>7.3</td>
+      <td>Termination and change of employment</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>7.3.1</td>
+      <td>Termination or change of employment responsibilities</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must defined information security responsibilities that remain valid after termination or change of employment responsibilities</td>
+  </tr>
+  <tr id="sub1">
+      <td>8</td>
+      <td>Asset management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>8.1</td>
+      <td>Responsibility for assets</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>8.1.1</td>
+      <td>Inventory of assets</td>
+      <td>✔</td>
+      <td>Tagging strategy to assist in asset inventory, ownership and classification of information is provided for use by Customer.</td>
+      <td>✔</td>
+      <td>Customer must determine an appropriate asset management tool for their organisation. Tagging can assist at a very high level, but needs to feed in to an appropriate tool.</td>
+  </tr>
+  <tr>
+      <td>8.1.2</td>
+      <td>Ownership of assets</td>
+      <td>✔</td>
+      <td>Tagging strategy to assist in asset inventory, ownership and classification of information is provided for use by Customer.</td>
+      <td>✔</td>
+      <td>Customer must define owners for each asset.</td>
+  </tr>
+  <tr>
+      <td>8.1.3</td>
+      <td>Acceptable use of assets</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must determine what is acceptable use of their assets.</td>
+  </tr>
+  <tr>
+      <td>8.1.4</td>
+      <td>Return of assets</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must ensure that assets are returned.</td>
+  </tr>
+  <tr id="sub2">
+      <td>8.2</td>
+      <td>Information classification</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>8.2.1</td>
+      <td>Classification of information</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must define classes of information, as well as classifying each asset. Tagging can assist as a technical measure, but is secondary to the defined policy</td>
+  </tr>
+  <tr>
+      <td>8.2.2</td>
+      <td>Labelling of information</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Depends on policy defined in 8.2.1</td>
+  </tr>
+  <tr>
+      <td>8.2.3</td>
+      <td>Handling of assets</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop procedures for handling of assets</td>
+  </tr>
+  <tr id="sub2">
+      <td>8.3</td>
+      <td>Media handling</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>8.3.1</td>
+      <td>Management of removable media</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop procedures for the management of removable media</td>
+  </tr>
+  <tr>
+      <td>8.3.2</td>
+      <td>Disposal of media</td>
+      <td>✔</td>
+      <td>Secure disposal of media as per AWS Controls - https://aws.amazon.com/compliance/data-center/controls/</td>
+      <td>✔</td>
+      <td>Customer must develop procedure for disposal of media, understanding that AWS is ISO 27001 certified and has controls in place to support the secure destruction of media</td>
+  </tr>
+  <tr>
+      <td>8.3.3</td>
+      <td>Physical media transfer</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop procedures for the secure transport of physical media</td>
+  </tr>
+  <tr id="sub1">
+      <td>9</td>
+      <td>Access control</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>9.1</td>
+      <td>Business requirements of access control</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>9.1.1</td>
+      <td>Access control policy</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must define an appropriate access control policy for each of their assets</td>
+  </tr>
+  <tr>
+      <td>9.1.2</td>
+      <td>Access to networks and network services</td>
+      <td>✔</td>
+      <td>Networks and services are secured to least privilege allowing access only where required</td>
+      <td>✔</td>
+      <td>Customer must define policy concerning the use of networks / network services. Technical measures can be implemented to support this policy.</td>
+  </tr>
+  <tr id="sub2">
+      <td>9.2</td>
+      <td>User access management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>9.2.1</td>
+      <td>User registration and de-registration</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing a process for user registration / de-registration</td>
+  </tr>
+  <tr>
+      <td>9.2.2</td>
+      <td>User access provisioning</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing a process to assign / revoke access rights</td>
+  </tr>
+  <tr>
+      <td>9.2.3</td>
+      <td>Management of privileged access rights</td>
+      <td>✔</td>
+      <td>Multi-factor authentication configured for IAM users</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring the allocation of privileged access rights is restricted and controlled</td>
+  </tr>
+  <tr>
+      <td>9.2.4</td>
+      <td>Management of secret authentication information of users</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing a process for the allocation of secret authentication information</td>
+  </tr>
+  <tr>
+      <td>9.2.5</td>
+      <td>Review of user access rights</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for reviewing user access rights at regular intervals</td>
+  </tr>
+  <tr>
+      <td>9.2.6</td>
+      <td>Removal or adjustment of access rights</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for revoking or adjusting access rights for users as required</td>
+  </tr>
+  <tr id="sub2">
+      <td>9.3</td>
+      <td>User responsibilities</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>9.3.1</td>
+      <td>Use of secret authentication information</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring users follow the organisation's practices in the use of secret authentication information</td>
+  </tr>
+  <tr id="sub2">
+      <td>9.4</td>
+      <td>System and application access control</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>9.4.1</td>
+      <td>Information access restriction</td>
+      <td>✔</td>
+      <td>IAM is provided for use by Customer.</td>
+      <td>✔</td>
+      <td>AWS controls will only be a small piece of a much larger puzzle. Customer is responsible for restricting information access.</td>
+  </tr>
+  <tr>
+      <td>9.4.2</td>
+      <td>Secure log-on procedures</td>
+      <td>✔</td>
+      <td>IAM is provided for use by Customer.</td>
+      <td>✔</td>
+      <td>AWS IAM is ISO 27001 compliant. CIS controls implemented to detect potential breaches. The controls implemented by xx do not apply to anything other than IAM (for example, customer specific applications, or third party identity providers).</td>
+  </tr>
+  <tr>
+      <td>9.4.3</td>
+      <td>Password management system</td>
+      <td>✔</td>
+      <td>AWS IAM password policy as per CIS AWS Benchmark</td>
+      <td>✔</td>
+      <td>AWS IAM is ISO 27001 compliant. An appropriate AWS IAM password policy will be configured as per the CIS AWS Benchmark. The controls implemented by xx do not apply to anything other than IAM (for example, customer specific applications, or third party identity providers).</td>
+  </tr>
+  <tr>
+      <td>9.4.4</td>
+      <td>Use of privileged utility programs</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for identifying utility programs with privileged access, and restricting the use of these</td>
+  </tr>
+  <tr>
+      <td>9.4.5</td>
+      <td>Access control to program source code</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for restricting access to source control software</td>
+  </tr>
+  <tr id="sub1">
+      <td>10</td>
+      <td>Cryptography</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>10.1</td>
+      <td>Cryptographic controls</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>10.1.1</td>
+      <td>Policy on the use of cryptographic controls</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining a policy on the use of cryptographic controls</td>
+  </tr>
+  <tr>
+      <td>10.1.2</td>
+      <td>Key management</td>
+      <td>✔</td>
+      <td>KMS is provided for use by Customer.</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining a policy on the use of cryptographic keys</td>
+  </tr>
+  <tr id="sub1">
+      <td>11</td>
+      <td>Physical and environmental security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>11.1</td>
+      <td>Secure areas</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>11.1.1</td>
+      <td>Physical security perimeter</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr>
+      <td>11.1.2</td>
+      <td>Physical entry controls</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr>
+      <td>11.1.3</td>
+      <td>Securing offices, rooms and facilities</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr>
+      <td>11.1.4</td>
+      <td>Protecting against external and environmental threats</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr>
+      <td>11.1.5</td>
+      <td>Working in secure areas</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr>
+      <td>11.1.6</td>
+      <td>Delivery and loading areas</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their premises</td>
+  </tr>
+  <tr id="sub2">
+      <td>11.2</td>
+      <td>Equipment</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>11.2.1</td>
+      <td>Equipment siting and protection</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.2</td>
+      <td>Supporting utilities</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.3</td>
+      <td>Cabling security</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.4</td>
+      <td>Equipment maintenance</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.5</td>
+      <td>Removal of assets</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.6</td>
+      <td>Security of equipment and assets off-premises</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.7</td>
+      <td>Secure disposal or reuse of equipment</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.8</td>
+      <td>Unattended user equipment</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr>
+      <td>11.2.9</td>
+      <td>Clear desk and clear screen policy</td>
+      <td>✔</td>
+      <td>AWS data centers are ISO 27001 compliant.</td>
+      <td>✔</td>
+      <td>The customer is responsible for the physical security of their equipment</td>
+  </tr>
+  <tr id="sub1">
+      <td>12</td>
+      <td>Operations security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>12.1</td>
+      <td>Operational procedures and responsibilities</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.1.1</td>
+      <td>Documented operating procedures</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer must develop operating procedures. xx delivered "as built documentation" will assist in this process.</td>
+  </tr>
+  <tr>
+      <td>12.1.2</td>
+      <td>Change management</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>The customer is responsible for defining processes for change management, or adopting a framework</td>
+  </tr>
+  <tr>
+      <td>12.1.3</td>
+      <td>Capacity management</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>xx can assist in developing suitable auto-scaling policies for customer workloads</td>
+  </tr>
+  <tr>
+      <td>12.1.4</td>
+      <td>Separation of development, testing and operational environments</td>
+      <td>✔</td>
+      <td>Separation of development, testing and operational environments at multiple levels</td>
+      <td>✔</td>
+      <td>Separated at AWS account and VPC levels</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.2</td>
+      <td>Protection from malware</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.2.1</td>
+      <td>Controls against malware</td>
+      <td>✔</td>
+      <td>xx Managed Services will provide endpoint malware protection</td>
+      <td>✔</td>
+      <td>Customer is responsible for controls against malware</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.3</td>
+      <td>Backup</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.3.1</td>
+      <td>Information backup</td>
+      <td>✔</td>
+      <td>Automated backups of workloads and data stores including procedures for recovery.</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining and maintaining backup policy.</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.3</td>
+      <td>Logging and monitoring</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.4.1</td>
+      <td>Event logging</td>
+      <td>✔</td>
+      <td>VPC flow logs are configured to log network traffic, AWS CloudTrail &amp; AWS Config configured for audit / change logging</td>
+      <td>✔</td>
+      <td>Customer is responsible for implementing event logging for applications and other services which do not support AWS native auditing tools</td>
+  </tr>
+  <tr>
+      <td>12.4.2</td>
+      <td>Protection of log information</td>
+      <td>✔</td>
+      <td>AWS audit logs are read only and only accessible by authorised personnel.</td>
+      <td>✔</td>
+      <td>Customer is responsible for implementing event logging for applications and other services which do not support AWS native auditing tools</td>
+  </tr>
+  <tr>
+      <td>12.4.3</td>
+      <td>Administrator and operator logs</td>
+      <td>✔</td>
+      <td>AWS CloudTrail configured for audit logging.</td>
+      <td>✔</td>
+      <td>Note that CloudTrail only captures changes to the AWS environment. Additional controls will be required for administrative access to other applications / tools / services / environments etc.</td>
+  </tr>
+  <tr>
+      <td>12.4.4</td>
+      <td>Clock synchronisation</td>
+      <td>✔</td>
+      <td>Configuration of AWS Time Sync on EC2 instances</td>
+      <td>✔</td>
+      <td>Customer is responsible for implementing clock sync as required on other workloads / services</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.5</td>
+      <td>Control of operational software</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.5.1</td>
+      <td>Installation of software on operational systems</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for implementing procedures for the installation of software on operating systems</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.6</td>
+      <td>Technical vulnerability management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.6.1</td>
+      <td>Management of technical vulnerabilities</td>
+      <td>✔</td>
+      <td>AWS Inspector is installed and configured on all AWS instances to regularly scan for vulnerabilities</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining a policy, procedures and technical measures for handling information about technical vulnerabilities</td>
+  </tr>
+  <tr>
+      <td>12.6.2</td>
+      <td>Restrictions on software installation</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining a policy to restrict the types of software that users can install.</td>
+  </tr>
+  <tr id="sub2">
+      <td>12.7</td>
+      <td>Information systems audit considerations</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>12.7.1</td>
+      <td>Information systems audit controls</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for determining auditing requirements, and planning these to minimise disruptions to business processes</td>
+  </tr>
+  <tr id="sub1">
+      <td>13</td>
+      <td>Communications security</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>13.1</td>
+      <td>Network security management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>13.1.1</td>
+      <td>Network controls</td>
+      <td>✔</td>
+      <td>"VPC security groups used to logically separate workloads and restrict traffic to authorised services and/or personnel. 
+      VPC flow logging configured.
+      Encryption in transit is used."</td>
+      <td>✔</td>
+      <td>Customer is responsible for ongoing network management, and appropriate use of the delivered VPCs.</td>
+  </tr>
+  <tr>
+      <td>13.1.2</td>
+      <td>Security of network services</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is required to implement security mechanisms, service levels and identify management requirements that shall be included in network services agreements, whether these services are provided in-house or outsourced.</td>
+  </tr>
+  <tr>
+      <td>13.1.3</td>
+      <td>Segregation in networks</td>
+      <td>✔</td>
+      <td>"VPC security groups used to logically separate workloads and restrict traffic to authorised services and/or personnel
+      Workload types are segregated at the network layer via multi-tier VPCs"</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring deployed workloads are adequately segregated.</td>
+  </tr>
+  <tr id="sub2">
+      <td>13.2</td>
+      <td>Information transfer</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>13.2.1</td>
+      <td>Information transfer policies and procedures</td>
+      <td>✔</td>
+      <td>All sensitive traffic is encrypted in transit using industry standard algorithms.</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining formal transfer policies and procedures. xx implemented controls can assist (e.g. encryption in transit)</td>
+  </tr>
+  <tr>
+      <td>13.2.2</td>
+      <td>Agreements on information transfer</td>
+      <td>✖</td>
+      <td>Out of scope.</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining transfer agreements to facilitate the secure transfer of business information between the organisation and external parties</td>
+  </tr>
+  <tr>
+      <td>13.2.3</td>
+      <td>Electronic messaging</td>
+      <td>✔</td>
+      <td>All sensitive traffic is encrypted in transit using industry standard algorithms.</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring implemented controls are adequate for the type of information being transferred.</td>
+  </tr>
+  <tr>
+      <td>13.2.4</td>
+      <td>Confidentiality or nondisclosure agreements</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining non-disclosure agreements, and regularly reviewing these</td>
+  </tr>
+  <tr id="sub1">
+      <td>14</td>
+      <td>System acquisition, development &amp; maintenance</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>14.1</td>
+      <td>Security requirements of information systems</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>14.1.1</td>
+      <td>Information security requirements analysis and specification</td>
+      <td>✖</td>
+      <td>Out of scope.</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining security requirements for new information systems or enhancements to existing systems</td>
+  </tr>
+  <tr>
+      <td>14.1.2</td>
+      <td>Securing application services on public networks</td>
+      <td>✔</td>
+      <td>All sensitive traffic is encrypted in transit using industry standard algorithms</td>
+      <td>✔</td>
+      <td>Encryption in transit is only a small piece of a larger puzzle. Customer is responsible for authentication, authorisation, avoiding duplicate transactions etc.</td>
+  </tr>
+  <tr>
+      <td>14.1.3</td>
+      <td>Protecting application services transactions</td>
+      <td>✔</td>
+      <td>All sensitive traffic is encrypted in transit using industry standard algorithms</td>
+      <td>✔</td>
+      <td>Encryption in transit is only a small piece of a larger puzzle. Customer is responsible for authentication, authorisation, avoiding duplicate transactions etc.</td>
+  </tr>
+  <tr id="sub2">
+      <td>14.2</td>
+      <td>Security in development and support processes</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>14.2.1</td>
+      <td>Secure development policy</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for defining a secure development policy</td>
+  </tr>
+  <tr>
+      <td>14.2.2</td>
+      <td>System change control procedures</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing change control procedures</td>
+  </tr>
+  <tr>
+      <td>14.2.3</td>
+      <td>Technical review of applications after operating platform changes</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for reviewing applications after operating platform changes</td>
+  </tr>
+  <tr>
+      <td>14.2.4</td>
+      <td>Restrictions on changes to software packages</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for restricting changes to software packages</td>
+  </tr>
+  <tr>
+      <td>14.2.5</td>
+      <td>Secure system engineering principles</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible establishing, documenting, and maintaining secure systems engineering principles</td>
+  </tr>
+  <tr>
+      <td>14.2.6</td>
+      <td>Secure Development Environment</td>
+      <td>✔</td>
+      <td>VPC security groups, AWS IAM roles</td>
+      <td>✔</td>
+      <td>Customer is responsible for the security of development environments; xx controls can assist</td>
+  </tr>
+  <tr>
+      <td>14.2.7</td>
+      <td>Outsourced development</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for supervising and monitoring activity of outsourced system development</td>
+  </tr>
+  <tr>
+      <td>14.2.8</td>
+      <td>System security testing</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for system security testing </td>
+  </tr>
+  <tr>
+      <td>14.2.9</td>
+      <td>System acceptance testing</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for system acceptable testing</td>
+  </tr>
+  <tr id="sub2">
+      <td>14.3</td>
+      <td>Test data</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>14.3.1</td>
+      <td>Protection of test data</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for carefully selecting, protecting and controlling test data; xx controls can assist</td>
+  </tr>
+  <tr id="sub1">
+      <td>15</td>
+      <td>Supplier relationships</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>15.1</td>
+      <td>Information security in supplier relationships</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>15.1.1</td>
+      <td>Information security policy for supplier relationships</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing a policy to mitigate risks associated with a supplier's access to the organisation's assets</td>
+  </tr>
+  <tr>
+      <td>15.1.2</td>
+      <td>Addressing security within supplier agreements</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring information security requirements are established and agreed with each supplier</td>
+  </tr>
+  <tr>
+      <td>15.1.3</td>
+      <td>ICT supply chain</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring information security requirements are established and agreed with each supplier</td>
+  </tr>
+  <tr id="sub2">
+      <td>15.2</td>
+      <td>Supplier service delivery management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>15.2.1</td>
+      <td>Monitoring and review of supplier services</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for monitoring, reviewing and auditing supplier service delivery</td>
+  </tr>
+  <tr>
+      <td>15.2.2</td>
+      <td>Managing changes to supplier services</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for managing changes to supplier services</td>
+  </tr>
+  <tr id="sub1">
+      <td>16</td>
+      <td>Information security incident management</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>16.1</td>
+      <td>Management of information security incidents &amp; improvements</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>16.1.1</td>
+      <td>Responsibilities and procedures</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for establishing management responsibilities and procedures for information security incidents</td>
+  </tr>
+  <tr>
+      <td>16.1.2</td>
+      <td>Reporting information security events</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for reporting information security events through appropriate management channels</td>
+  </tr>
+  <tr>
+      <td>16.1.3</td>
+      <td>Reporting information security weaknesses</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring that employees and contractors report information security weaknesses</td>
+  </tr>
+  <tr>
+      <td>16.1.4</td>
+      <td>Assessment of and decision on information security events</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for determining if an information security event is to be classified as an information security incident</td>
+  </tr>
+  <tr>
+      <td>16.1.5</td>
+      <td>Response to information security incidents</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for responding to information security events as per documented procedures 16.1.11</td>
+  </tr>
+  <tr>
+      <td>16.1.6</td>
+      <td>Learning from information security incidents</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring knowledge gained from analysing and responding to information security incidents is used to reduce the likelihood of future incidents</td>
+  </tr>
+  <tr>
+      <td>16.1.7</td>
+      <td>Collection of evidence</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for establishing and following procedures for collecting information which may serve as evidence</td>
+  </tr>
+  <tr id="sub1">
+      <td>17</td>
+      <td>Information security aspects of BCM</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>17.1</td>
+      <td>Information security continuity</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>17.1.1</td>
+      <td>Planning information security continuity</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for planning information security continuity in the event of a crisis or disaster</td>
+  </tr>
+  <tr>
+      <td>17.1.2</td>
+      <td>Implementing information security continuity</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring information security continuity during event of a crisis or disaster</td>
+  </tr>
+  <tr>
+      <td>17.1.3</td>
+      <td>Verify, review and evaluate information security continuity</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for reviewing and verifying the information security continuity controls at regular intervals.</td>
+  </tr>
+  <tr>
+      <td>17.2</td>
+      <td>Redundancies</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>17.2.1</td>
+      <td>Availability of information processing facilities</td>
+      <td>✔</td>
+      <td>xx shall architect, design and implement the AWS environment as per the application hosting requirements provided by customer.</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring that the application is resilient and can work in a highly available configuration.</td>
+  </tr>
+  <tr id="sub1">
+      <td>18</td>
+      <td>Compliance</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr id="sub2">
+      <td>18.1</td>
+      <td>Compliance with legal and contractual requirements</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>18.1.1</td>
+      <td>Identification of applicable legislation and contractual requirements</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring applicable legal, statutory, regulatory or contractual obligations are adhered to. These should be documented and kept up to date.</td>
+  </tr>
+  <tr>
+      <td>18.1.2</td>
+      <td>Intellectual property rights</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring compliance with legislative, regulatory and contractual requirements relating to intellectual property rights</td>
+  </tr>
+  <tr>
+      <td>18.1.3</td>
+      <td>Protection of records</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing and implementing appropriate controls depending on the classification of each data store. Backups and encryption at rest is a great start, however there will be additional controls depending on the nature of the data.</td>
+  </tr>
+  <tr>
+      <td>18.1.4</td>
+      <td>Privacy and protection of personally identifiable information</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for developing a data policy in relation to the privacy and protection of PII.</td>
+  </tr>
+  <tr>
+      <td>18.1.5</td>
+      <td>Regulation of cryptographic controls</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring the use of cryptographic controls in compliance with relevant agreements, legislation and regulations.</td>
+  </tr>
+  <tr id="sub2">
+      <td>18.2</td>
+      <td>Information security reviews</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>18.2.1</td>
+      <td>Independent review of information security</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring its management and implementation of information security is independently reviewed at regular intervals, or when significant changes occur</td>
+  </tr>
+  <tr>
+      <td>18.2.2</td>
+      <td>Compliance with security policies and standards</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for ensuring management continually review compliance of information processing and procedures within their area of responsibility.</td>
+  </tr>
+  <tr>
+      <td>18.2.3</td>
+      <td>Technical compliance review</td>
+      <td>✖</td>
+      <td>Out of scope</td>
+      <td>✔</td>
+      <td>Customer is responsible for regularly reviewing information systems' compliance with the organisation's information security policies and standards</td>
+  </tr>
+</table>
+
+</body>
+</html>
+

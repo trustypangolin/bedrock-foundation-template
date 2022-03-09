@@ -1,0 +1,122 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: AWS Billing - Cost and Usage Reporting - Management Account
+#====================================================================================================
+#                                             Parameters
+#====================================================================================================
+Parameters:
+  UniquePrefix:
+    Description: "The prefix to be used at the beginning of the S3 Bucket"
+    Type: String
+  #--------------------------------------------------------------------------------------------------
+  RetentionPeriod:
+    Default: 7
+    Description: "Retention Period in Days"
+    Type: String
+    AllowedValues: [7, 31, 90, 180, 365, 2555]
+#====================================================================================================
+#                                             Resources
+#====================================================================================================
+Resources:
+  #====================================================================================================
+  # S3 Resources - Cost and Usage Reports Bucket
+  #====================================================================================================
+  BillingCURBucket:
+    # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: "AWS::S3::Bucket"
+    Properties:
+      BucketName: !Sub "${UniquePrefix}-cur"
+      LoggingConfiguration:
+        DestinationBucketName: !Ref AccountAccessLogsBucket
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  BillingCURBucketPolicy:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref BillingCURBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: "billingreports.amazonaws.com"
+            Action:
+              - s3:GetBucketAcl
+              - s3:GetBucketPolicy
+            Resource: !Sub "arn:aws:s3:::${BillingCURBucket}"
+          - Effect: Allow
+            Principal:
+              Service: "billingreports.amazonaws.com"
+            Action: s3:PutObject
+            Resource: !Sub "arn:aws:s3:::${BillingCURBucket}/*"
+          - Sid: AllowSSLRequestsOnly
+            Action: s3:*
+            Effect: Deny
+            Resource:
+              - !Sub arn:aws:s3:::${BillingCURBucket}
+              - !Sub arn:aws:s3:::${BillingCURBucket}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+            Principal: "*"
+
+  AccountAccessLogsBucket:
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Type: "AWS::S3::Bucket"
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          # checkov:skip=CKV_AWS_18:Ensure the S3 bucket has access logging enabled
+          # checkov:skip=CKV_AWS_21:Ensure the S3 bucket has versioning enabled
+          - id: W35
+            reason: "This is the Logging Bucket"
+    Properties:
+      BucketName: !Sub "${UniquePrefix}-mgmt-logging-access-logs"
+      AccessControl: "LogDeliveryWrite"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Status: Enabled
+            Id: Remove Old Logs
+            ExpirationInDays: !Ref RetentionPeriod
+
+  AccountAccessLogsBucketPolicy:
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref AccountAccessLogsBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowSSLRequestsOnly
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !Sub arn:aws:s3:::${AccountAccessLogsBucket}
+              - !Sub arn:aws:s3:::${AccountAccessLogsBucket}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"

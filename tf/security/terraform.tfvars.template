@@ -1,0 +1,9 @@
+state = {
+  bucket         = "indigocapybara-tfstate"
+  dynamodb_table = "bedrock-tfstate"
+  key            = "bedrock/org"
+  region         = "ap-southeast-2"
+}
+
+# SECRET for BEDROCK_TF_VARS 
+# awk 'NF && ! /#/' terraform.tfvars | base64

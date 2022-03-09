@@ -1,0 +1,60 @@
+#====================================================================================================
+# Description : Terraform state files for this project are stored in S3 with locking done using a DynamoDB table in Management Account.
+# Author      : Benjamin Luton
+# Date        : 2021-08-01
+# Version     : 1.0.0
+#====================================================================================================
+
+// Run a terraform apply first, then uncomment this get optional remote state data values
+// data "terraform_remote_state" "prod" {
+//   backend = "s3"
+//   config = {
+//     bucket         = join("-", [
+//       var.customer_prefix,
+//       "tfstate"
+//       ])
+//     key            = "peering" 
+//     region         = var.base_region
+//     dynamodb_table = "bedrock-tfstate"
+//   }
+// }
+
+
+# ============= import the outputs (network ids) from central remote state ======================================
+data "terraform_remote_state" "central" {
+  backend = "s3"
+  config = {
+    bucket = join("-", [
+      var.customer_prefix,
+      "tfstate"
+    ])
+    key            = "central"
+    region         = var.base_region
+    dynamodb_table = "bedrock-tfstate"
+  }
+}
+
+# ============= import the outputs (network ids) from prod remote state ======================================
+data "terraform_remote_state" "prod" {
+  backend = "s3"
+  config = {
+    bucket = join("-", [
+      var.customer_prefix,
+      "tfstate"
+    ])
+    key            = "prod"
+    region         = var.base_region
+    dynamodb_table = "bedrock-tfstate"
+  }
+}
+
+// manually change this file to upload an org object to s3
+// this object will be used in the bedrock to reference actual account numbers
+terraform {
+  backend "s3" {
+    //    bucket         = "%CUSTOMERPREFIX%-tfstate" # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="bucket=customer-tfstate"
+    key            = "peering" 
+    region         = var.base_region
+    dynamodb_table = "bedrock-tfstate"
+  }
+}

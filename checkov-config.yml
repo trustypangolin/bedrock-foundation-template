@@ -1,0 +1,57 @@
+download-external-modules: false
+evaluate-variables: true
+framework:
+  - terraform
+quiet: true
+skip-check:
+  # Unwanted Checks - Not ready to address these as yet, they have to be dealt with eventually
+  - CKV2_AWS_27 # Aurora/RDS Query Logging
+  - CKV2_AWS_3  # GuardDuty auto_enable is enabled, this is a false positive?
+  - CKV2_AWS_8  # Aurora/RDS Clusters use AWS Backup
+  - CKV_AWS_107 # Ensure IAM policies does not allow credentials exposure
+  - CKV_AWS_108 # Ensure IAM policies does not allow data exfiltration
+  - CKV_AWS_109 # Ensure IAM policies does not allow permissions management / resource exposure without constraints
+  - CKV_AWS_111 # Ensure IAM policies does not allow write access without constraints
+  - CKV_AWS_139 # Deletion Protection on Aurora/RDS - Required only for Prod, so need a flag
+  - CKV_AWS_144 # S3 Cross-Region Replication
+  - CKV_AWS_18  # S3 Access Logging
+  - CKV_AWS_21  # S3 Versioning
+  - CKV_AWS_249 # Ensure that the Execution Role ARN and the Task Role ARN are different in ECS Task definitions
+  - CKV_AWS_26  # Ensure all data stored in the SNS topic is encrypted - requires CMK policies
+  - CKV_AWS_27  # Ensure all data stored in the SQS queue is encrypted - requires CMK policies
+  
+  # Optional Extras, maybe these are on or off depending on solution or scale
+  - CKV_AWS_252 # Ensure CloudTrail defines an SNS Topic - Sent to CloudWatch Logs with Metrics, don't need another spot as yet
+  - CKV_AWS_115 # Ensure that AWS Lambda function is configured for function - level concurrent execution limit - dont' want this yet
+  - CKV_AWS_50  # X-ray tracing is enabled for Lambda - Not required until we get a problem
+  - CKV_AWS_116 # Lambda Dead Letter Queue - Required if you have code to deal with a DLQ
+  - CKV_AWS_162 # IAM Auth for Aurora/RDS Clusters - Only if Solution requires
+  - CKV_AWS_128 # IAM Auth for Aurora/RDS Instance - Only if Solution requires
+
+  # Mitigated Framework - we address these elsewhere
+  - CKV2_AWS_5  # Security Attachment to a resource is not part of the module
+  - CKV_AWS_117 # Lambda functions that don't interact with VPC do not require VPC connectivity
+  - CKV_AWS_130 # Public IP allocation by default in Public subnets is wanted
+  - CKV_AWS_135 # EC2 EBS optimisation is enabled by default for recent instance types
+  - CKV_AWS_229 # Inbound port 21 mitigated with solution design
+  - CKV_AWS_230 # Inbound port 20 mitigated with solution design
+  - CKV_AWS_231 # Inbound port 3389 mitigated with solution design
+  - CKV_AWS_232 # Inbound port 22 mitigated with solution design
+  - CKV_AWS_260 # Inbound port 80 mitigated with solution design
+  - CKV_AWS_79  # Instance Metadata Service Version 1 not required
+  - CKV_AWS_8   # EC2 EBS Encryption by default set on Account Region level
+  - CKV_AWS_68  # WAF Not part of CloudFront Module solution, WAF would be different module
+
+  # Enhanced Monitoring - Not required
+  - CKV_AWS_126 # Detailed Monitoring only required for pet EC2, not cattle
+
+  # Compliance Model Reduced Framework - Customer KMS Exclusions -  Rely on AWS Managed Keys or SSE for Encryption at Rest Resources
+  - CKV2_AWS_34 # SSM Parameters
+  - CKV_AWS_119 # DynamoDB
+  - CKV_AWS_145 # S3
+  - CKV_AWS_149 # Secrets Manager
+  - CKV_AWS_158 # CloudWatch LogGroups
+  - CKV_AWS_173 # Lambda
+  - CKV_AWS_184 # EFS
+  - CKV_AWS_224 # ECS Cluster
+  - CKV_AWS_7   # KMS Rotation not required

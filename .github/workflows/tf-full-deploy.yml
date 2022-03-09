@@ -1,0 +1,42 @@
+name: Terraform Full Deployment
+on: # A full Deployment regardless of which environment was actually changed
+  # push:
+  #   branches:
+  #     - main
+  # pull_request:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+# Ensure the Organisation has all the required outputs for the Accounts
+  call-org:
+    uses: ./.github/workflows/tf-account.yml
+    with:
+      account: org
+    secrets:
+      AWS_ROOT_ACCOUNT: ${{ secrets.AWS_ROOT_ACCOUNT }}
+      BEDROCK_TF_VARS: ${{ secrets.BEDROCK_TF_VARS }}
+      BEDROCK_TF_STATE: ${{ secrets.BEDROCK_TF_STATE }}
+
+# Managment Account Baseline
+  call-managment:
+    needs: call-org
+    uses: ./.github/workflows/tf-account.yml
+    with:
+      account: managment
+    secrets:
+      AWS_ROOT_ACCOUNT: ${{ secrets.AWS_ROOT_ACCOUNT }}
+      BEDROCK_TF_VARS: ${{ secrets.BEDROCK_TF_VARS }}
+      BEDROCK_TF_STATE: ${{ secrets.BEDROCK_TF_STATE }}
+
+# Security Account Baseline
+  call-security:
+    needs: call-org
+    uses: ./.github/workflows/tf-account.yml
+    with:
+      account: security
+    secrets:
+      AWS_ROOT_ACCOUNT: ${{ secrets.AWS_ROOT_ACCOUNT }}
+      BEDROCK_TF_VARS: ${{ secrets.BEDROCK_TF_VARS }}
+      BEDROCK_TF_STATE: ${{ secrets.BEDROCK_TF_STATE }}

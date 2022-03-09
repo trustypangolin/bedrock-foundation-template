@@ -1,0 +1,214 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-template
+  title: Create Bedrock AWS Terraform Landing Zone
+  description: Create new Terraform Landing Zone for AWS
+  tags:
+    - terraform
+    - aws
+    - github
+    - gitlab
+    - bitbucket
+spec:
+  type: service
+  lifecycle: development
+  owner: trustypangolin
+  parameters:
+    - title: Project Details
+      required:
+        - name
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:autofocus: true
+          ui:options:
+            rows: 5
+        owner:
+          title: Project Owner
+          type: string
+          description: Group responsible for the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+        codeOwners:
+          title: Default CODEOWNERS
+          type: array
+          description: Git users or groups that will be requested for review when someone opens a pull request e.g. `@trustypangolin/group`, `@username` or `john.doe@somedomain.io`
+          items:
+            type: string
+          ui:options:
+            orderable: false
+
+    - title: Choose requirements
+      properties:
+        energy:
+          title: Energy CDR
+          description: Energy CDR
+          type: boolean
+          default: false
+        telco:
+          title: Telco CDR
+          description: Telco CDR
+          type: boolean
+          default: false
+        admin:
+          title: Admin CDR
+          description: Admin CDR
+          type: boolean
+          default: false
+
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+              - gitlab.com
+              - bitbucket.org
+
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
+  steps:
+    - id: fetch-base
+      name: Fetch Core
+      action: fetch:template
+      input:
+        copyWithoutTemplating:
+          - \*\*/node_modules/**/*
+          - \*\*/.yarn/**/*
+        url: ./templates/cdr-base
+        targetPath: ./
+        values:
+          codeOwners: ${{ parameters.codeOwners }}
+          projectType: ${{ parameters.projectType }}
+          slug: ${{ parameters.name | lower | replace(" ", "-") }}
+          owner: ${{ parameters.owner }}
+          repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+          authorEmail: ${{ user.entity.spec.profile.email }}
+          authorName: ${{ user.entity.spec.profile.displayName }}
+          name: ${{ parameters.name }}
+          githubToken: ${{ steps.get-config.output.token  }}
+
+    - id: fetch-common
+      name: Fetch Common
+      action: fetch:template
+      input:
+        copyWithoutTemplating:
+          - \*\*/node_modules/**/*
+          - \*\*/.yarn/**/*
+        url: ./templates/plugins/cdr-common
+        targetPath: ./plugins/cdr-common
+        values:
+          codeOwners: ${{ parameters.codeOwners }}
+          projectType: ${{ parameters.projectType }}
+          slug: ${{ parameters.name | lower | replace(" ", "-") }}
+          owner: ${{ parameters.owner }}
+          repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+          authorEmail: ${{ user.entity.spec.profile.email }}
+          authorName: ${{ user.entity.spec.profile.displayName }}
+          name: ${{ parameters.name }}
+          githubToken: ${{ steps.get-config.output.token  }}
+
+    - id: fetch-energy
+      if: ${{ parameters.energy }}
+      name: Fetch Energy
+      action: fetch:template
+      input:
+        copyWithoutTemplating:
+          - \*\*/node_modules/**/*
+          - \*\*/.yarn/**/*
+        url: ./templates/plugins/cdr-energy
+        targetPath: ./plugins/cdr-energy
+        values:
+          codeOwners: ${{ parameters.codeOwners }}
+          projectType: ${{ parameters.projectType }}
+          slug: ${{ parameters.name | lower | replace(" ", "-") }}
+          owner: ${{ parameters.owner }}
+          repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+          authorEmail: ${{ user.entity.spec.profile.email }}
+          authorName: ${{ user.entity.spec.profile.displayName }}
+          name: ${{ parameters.name }}
+          githubToken: ${{ steps.get-config.output.token  }}
+
+    - id: fetch-telco
+      if: ${{ parameters.telco }}
+      name: Fetch Telco
+      action: fetch:template
+      input:
+        copyWithoutTemplating:
+          - \*\*/node_modules/**/*
+          - \*\*/.yarn/**/*
+        url: ./templates/plugins/cdr-telco
+        targetPath: ./plugins/cdr-telco
+        values:
+          codeOwners: ${{ parameters.codeOwners }}
+          projectType: ${{ parameters.projectType }}
+          slug: ${{ parameters.name | lower | replace(" ", "-") }}
+          owner: ${{ parameters.owner }}
+          repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+          authorEmail: ${{ user.entity.spec.profile.email }}
+          authorName: ${{ user.entity.spec.profile.displayName }}
+          name: ${{ parameters.name }}
+          githubToken: ${{ steps.get-config.output.token  }}
+
+    - id: fetch-admin
+      name: Fetch Admin
+      action: fetch:template
+      input:
+        copyWithoutTemplating:
+          - \*\*/node_modules/**/*
+          - \*\*/.yarn/**/*
+        url: ./templates/plugins/cdr-admin
+        targetPath: ./plugins/cdr-admin
+        values:
+          codeOwners: ${{ parameters.codeOwners }}
+          projectType: ${{ parameters.projectType }}
+          slug: ${{ parameters.name | lower | replace(" ", "-") }}
+          owner: ${{ parameters.owner }}
+          repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+          authorEmail: ${{ user.entity.spec.profile.email }}
+          authorName: ${{ user.entity.spec.profile.displayName }}
+          name: ${{ parameters.name }}
+          githubToken: ${{ steps.get-config.output.token  }}
+
+    - id: log
+      name: Log
+      action: debug:log
+      input:
+        listWorkspace: true
+        message: "items installed"
+
+    # This step publishes the contents of the working directory to GitHub.
+    - id: publish
+      name: Publish
+      action: publish:github
+      input:
+        defaultBranch: main
+        allowedHosts: ["github.com"]
+        description: This is ${{ parameters.name }}
+        repoUrl: https://${{ parameters.repoUrl | replace("?owner=", "/") | replace("&repo=", "/") }}
+
+    # The final step is to register our new component in the catalog.
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
+
+  # Outputs are displayed to the user after a successful execution of the template.
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#controls {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#controls td, #controls th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#controls tr:nth-child(even){background-color: #f2f2f2;}
+
+#controls tr:hover {background-color: #ddd;}
+
+#controls th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #202261;
+  color: white;
+}
+
+#first {
+  border-left: none;
+  width: 15em;
+  min-width: 15em;
+  max-width: 15em;
+}
+
+</style>
+</head>
+<body>
+
+  <table id="controls">
+    <tr>
+        <th id="first">Standard Control Approach - Asset Management</th>
+        <th>Reference</th>
+        <th>PCI V3.2.1</th>
+        <th>APRA CPG 234</th>
+        <th>CSA CCM V3.0.1</th>
+        <th>ISO 27001:2013</th>
+        <th>ISO 27017:2015</th>
+        <th>GDPR 2016/679</th>
+        <th>CIS v7</th>
+        <th>CIS AWS 1.2</th>
+        <th>ACSC Protect</th>
+    </tr>
+    <tr>
+        <td>Development of tagging strategy to assist in asset inventory, ownership and classification of information</td>
+        <td></td>
+        <td></td>
+        <td>45</td>
+        <td>DSI-04</td>
+        <td>8.1.1, 8.1.2</td>
+        <td>8.1.1, 8.1.2</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Secure disposal of media as per AWS Controls</td>
+        <td></td>
+        <td>3.1</td>
+        <td>55</td>
+        <td></td>
+        <td>8.3.2</td>
+        <td>8.3.2</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+
+  <tr>
+      <th id="first">Standard Control Approach - Network Security</th>
+      <th>Reference</th>
+      <th>PCI V3.2.1</th>
+      <th>APRA CPG 234</th>
+      <th>CSA CCM V3.0.1</th>
+      <th>ISO 27001:2013</th>
+      <th>ISO 27017:2015</th>
+      <th>GDPR 2016/679</th>
+      <th>CIS v7</th>
+      <th>CIS AWS 1.2</th>
+      <th>ACSC Protect</th>
+  </tr>
+  <tr>
+      <td>VPC security groups used to logically separate workloads and restrict traffic to authorised services and/or personnel</td>
+      <td></td>
+      <td></td>
+      <td>48, 49, 52, 53, 58</td>
+      <td>IVS-06</td>
+      <td>13.1.1, 13.1.3</td>
+      <td>13.1.1, 13.1.3</td>
+      <td></td>
+      <td>2.10, 9.4, 9.5, 12.4 14.1, 14.2, 14.3</td>
+      <td>4.3</td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>Security group rules and route tables are least privilege, with reasons documented for each rule</td>
+      <td></td>
+      <td>1.1, 1.1.4, 1.2</td>
+      <td>48, 49, 52, 53, 58</td>
+      <td>IVS-06</td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td>11.1, 11.2</td>
+      <td>4.1, 4.2, 4.3, 4.4</td>
+      <td></td>
+  </tr>
+  <tr>
+      <td>Workload types are segregated at the network layer via multi-tier VPCs</td>
+      <td></td>
+      <td>1.3.1, 1.3.2, 1.3.6, 1.3.7</td>
+      <td>48, 49, 52, 53, 58</td>
+      <td>IVS-06</td>
+      <td>13.1.3</td>
+      <td>13.1.3</td>
+      <td></td>
+      <td>14.1</td>
+      <td></td>
+      <td></td>
+  </tr>
+</table>
+
+</body>
+</html>
+

@@ -1,0 +1,45 @@
+terraform {
+  required_version = "~> 1.2.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+# import the outputs (accounts ids) from org remote state
+data "terraform_remote_state" "org" {
+  backend = "s3"
+  config  = var.state
+}
+
+locals {
+  security = data.terraform_remote_state.org.outputs.acc[
+    lookup(data.terraform_remote_state.org.outputs.acc_map, "Security")
+  ]
+  central = data.terraform_remote_state.org.outputs.acc[
+    lookup(data.terraform_remote_state.org.outputs.acc_map, "Central")
+  ]
+  unique_prefix = data.terraform_remote_state.org.outputs.unique_prefix
+  base_region   = data.terraform_remote_state.org.outputs.base_region
+  grafana_id    = data.terraform_remote_state.org.outputs.grafana_id
+  environment   = "central"
+}
+
+data "aws_regions" "current" {}
+data "aws_caller_identity" "current" {}
+
+provider "aws" {
+  region = local.region
+  assume_role {
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", local.central)
+    session_name = "terraform"
+  }
+  default_tags {
+    tags = {
+      Service = "Bedrock",
+      Version = "3.0.0"
+    }
+  }
+}

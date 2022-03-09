@@ -1,0 +1,4 @@
+tags = {
+  Environment     = "Peering"
+  Bootstrap       = "Terraform"
+}

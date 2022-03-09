@@ -1,0 +1,253 @@
+# -------- check if Instance is tagged -----------------
+resource "aws_config_config_rule" "required_tags_ec2" {
+  description = "Check EC2 Instance Resources have required billing tags"
+  name        = "bedrock-required-tags-ec2"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::EC2::Instance",
+      "AWS::EC2::Volume"
+    ]
+  }
+}
+
+# -------- check if Networking resources are tagged -----------------
+resource "aws_config_config_rule" "required_tag_network" {
+  description = "Check Networking have required billing tags"
+  name        = "bedrock-required-tags-network"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::EC2::NetworkAcl",
+      "AWS::EC2::InternetGateway",
+      "AWS::EC2::NetworkInterface",
+      "AWS::EC2::Subnet",
+      "AWS::EC2::RouteTable"
+    ]
+  }
+}
+
+# -------- check if security groups are tagged -----------------
+resource "aws_config_config_rule" "required_tag_sg" {
+  description = "Check EC2 Security Groups Resources have required billing tags"
+  name        = "bedrock-required-tags-security-group"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::EC2::SecurityGroup"
+    ]
+  }
+}
+
+# # -------- check if RDS is tagged -----------------
+resource "aws_config_config_rule" "required_tag_rds" {
+  description = "Check RDS Resources have required billing tags"
+  name        = "bedrock-required-tags-RDS"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::RDS::DBInstance",
+      "AWS::RDS::DBSnapshot",
+      "AWS::RDS::DBSubnetGroup",
+      "AWS::RDS::EventSubscription"
+    ]
+  }
+}
+
+# # -------- check if S3 Buckets are tagged -----------------
+resource "aws_config_config_rule" "required_tag_s3" {
+  description = "Check S3 Resources have required billing tags"
+  name        = "bedrock-required-tags-S3"
+  input_parameters = jsonencode(zipmap(
+    [for s in range(1, length(var.tags) + 1) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  ))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::S3::Bucket"
+    ]
+  }
+}
+
+# # -------- check if Lambda is tagged -----------------
+resource "aws_config_config_rule" "required_tag_lambda" {
+  description = "Check Lambda Resources have required billing tags"
+  name        = "bedrock-required-tags-Lambda"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::Lambda::Function"
+    ]
+  }
+}
+
+# # -------- check if CloudTrail is tagged -----------------
+resource "aws_config_config_rule" "required_tag_cloudtrail" {
+  description = "Check CloudTrail Resources have required billing tags"
+  name        = "bedrock-required-tags-CloudTrail"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::CloudTrail::Trail"
+    ]
+  }
+}
+
+# # -------- check if ElasticBeanstalk is tagged -----------------
+resource "aws_config_config_rule" "required_tag_eb" {
+  description = "Check ElasticBeanstalk Applications have required billing tags"
+  name        = "bedrock-required-tags-ElasticBeanstalk"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::ElasticBeanstalk::Application"
+    ]
+  }
+}
+
+# # -------- check if required certificate is tagged -----------------
+resource "aws_config_config_rule" "required_tag_cert" {
+  description = "Check Certificate Resources have required billing tags"
+  name        = "bedrock-required-tags-Certificates"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::ACM::Certificate"
+    ]
+  }
+}
+
+# # -------- check if autoscaling is tagged -----------------
+resource "aws_config_config_rule" "required_tag_autoscaling" {
+  description = "Check Autoscaling and LoadBalancer Resources have required billing tags"
+  name        = "bedrock-required-tags-Autoscaling"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::AutoScaling::AutoScalingGroup",
+      "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    ]
+  }
+}
+
+# # -------- check if KMS is tagged -----------------
+resource "aws_config_config_rule" "required_tag_kms" {
+  description = "Check KMS have required billing tags"
+  name        = "bedrock-required-tags-KMS"
+  input_parameters = jsonencode(merge({ "tag1Key" = "Name" }, zipmap(
+    [for s in range(2, length(var.tags) + 2) : format("tag%sKey", s)],
+    [for key, value in var.tags : key]
+  )))
+
+  source {
+    owner             = "AWS"
+    source_identifier = "REQUIRED_TAGS"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::KMS::Key"
+    ]
+  }
+}
+
+
+# # -------- CIS 4.2	Ensure no security groups allow ingress from 0.0.0.0/0 to common Remote and DB ports ------
+resource "aws_config_config_rule" "sg_disallow_tcp_traffic" {
+  description      = "Evaluates whether security groups that are in use disallow unrestricted incoming TCP traffic to the specified ports."
+  name             = "bedrock-security-groups-must-disallow-Tcp-traffic"
+  input_parameters = <<EOF
+{
+  "blockedPort1": "3389",
+  "blockedPort2": "1433",
+  "blockedPort3": "5432",
+  "blockedPort4": "3306",
+  "blockedPort5": "1522"
+}
+EOF
+
+  source {
+    owner             = "AWS"
+    source_identifier = "RESTRICTED_INCOMING_TRAFFIC"
+  }
+  scope {
+    compliance_resource_types = [
+      "AWS::EC2::SecurityGroup"
+    ]
+  }
+}

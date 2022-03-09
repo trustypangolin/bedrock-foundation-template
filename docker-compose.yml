@@ -1,0 +1,28 @@
+version: "3.7"
+services:
+
+  # iac-scanner:
+  #   image: papina/iac-scanner
+  #   container_name: "iac-scanner"
+  #   volumes:
+  #     - ${PWD}:/src
+
+  techdocs-bedrock:
+    image: spotify/techdocs:latest
+    volumes:
+      - ./:/content
+    working_dir: /content
+    networks:
+      # - mkdocs
+      - backstage
+    command:
+      - serve
+      - -a
+      - 0.0.0.0:8000
+    labels:
+      - "traefik.http.services.techdocs-svc.loadbalancer.server.port=8000" # Techdocs
+
+networks:
+  backstage:
+    external: true
+    name: backstage

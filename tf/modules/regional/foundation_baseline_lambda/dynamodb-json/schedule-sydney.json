@@ -1,0 +1,19 @@
+{
+  "name": {
+    "S": "AU-SYD-OfficeHours"
+  },
+  "type": {
+    "S": "schedule"
+  },
+  "timezone": {
+    "S": "Australia/Sydney"
+  },
+  "description": {
+    "S": "Office hours in Sydney"
+  },
+  "periods": {
+    "SS": [
+      "office-hours"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+site_name: AWS Bedrock Landing Zone Template
+site_description: AWS Bedrock Landing Zone Template
+repo_url: https://gitlab.com/trustypangolin/bedrock-foundation-template
+edit_uri: edit/main/docs/docs/
+
+theme: readthedocs
+
+nav:
+  - Home: index.md
+  - SubDocs: "*include ./sub-docs/*/mkdocs.yml"
+
+plugins:
+  - techdocs-core
