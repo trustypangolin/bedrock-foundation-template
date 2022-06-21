@@ -1,4 +1,5 @@
 resource "aws_iam_role" "lambda_childmgmt" {
+  count               = var.lambda_crossaccount_role == true ? 1 : 0
   name                = var.crossaccountrole
   assume_role_policy  = data.aws_iam_policy_document.child_mgmt.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
@@ -31,17 +32,24 @@ resource "aws_iam_role" "lambda_childmgmt" {
     name   = "IAMAccess"
     policy = data.aws_iam_policy_document.iamkeys.json
   }
+
+  # Only useful for Management Account to list accounts in the OU
+  inline_policy {
+    name   = "OrgListAccess"
+    policy = data.aws_iam_policy_document.orglistacc.json
+  }
+
 }
 
 data "aws_iam_policy_document" "child_mgmt" {
   statement {
-    sid = "AssumeFromShared"
+    sid = "AssumeFromCentral"
     actions = [
       "sts:AssumeRole"
     ]
     principals {
       type        = "AWS"
-      identifiers = [var.central]
+      identifiers = [format("arn:aws:iam::%s:root", var.central)]
     }
   }
 }
@@ -210,6 +218,21 @@ data "aws_iam_policy_document" "iamkeys" {
       "iam:ListGroupsForUser",
       "iam:ListAccessKeys",
       "iam:UpdateAccessKey"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "orglistacc" {
+  statement {
+    sid    = "alloworglist"
+    effect = "Allow"
+    actions = [
+      "organizations:ListAccounts",
+      "organizations:ListAccountsForParent",
+      "organizations:DescribeOrganization",
     ]
     resources = [
       "*"

@@ -7,7 +7,7 @@ resource "aws_route" "dev_public_to_vpc_peering_rtb" {
   provider                  = aws.dev
   for_each                  = toset(data.terraform_remote_state.development.outputs.public_rt_ids)
   route_table_id            = each.value
-  destination_cidr_block    = data.terraform_remote_state.shared.outputs.vpc_cidr
+  destination_cidr_block    = data.terraform_remote_state.central.outputs.vpc_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection_accepter.peer_dev.id
 }
 
@@ -20,7 +20,7 @@ resource "aws_route" "dev_private_to_vpc_peering_rtbl" {
   provider                  = aws.dev
   for_each                  = toset(data.terraform_remote_state.development.outputs.private_rt_ids)
   route_table_id            = each.value
-  destination_cidr_block    = data.terraform_remote_state.shared.outputs.vpc_cidr
+  destination_cidr_block    = data.terraform_remote_state.central.outputs.vpc_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection_accepter.peer_dev.id
 }
 
@@ -33,6 +33,6 @@ resource "aws_route" "dev_secure_to_vpc_peering_rtb" {
   provider                  = aws.dev
   for_each                  = toset(data.terraform_remote_state.development.outputs.secure_rt_ids)
   route_table_id            = each.value
-  destination_cidr_block    = data.terraform_remote_state.shared.outputs.vpc_cidr
+  destination_cidr_block    = data.terraform_remote_state.central.outputs.vpc_cidr
   vpc_peering_connection_id = aws_vpc_peering_connection_accepter.peer_dev.id
 }

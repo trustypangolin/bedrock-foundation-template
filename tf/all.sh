@@ -10,7 +10,7 @@ terraform init
 terraform apply --auto-approve
 cd ..
 
-cd shared
+cd central
 terraform init
 terraform apply --auto-approve
 cd ..

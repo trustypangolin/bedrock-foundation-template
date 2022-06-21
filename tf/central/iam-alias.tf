@@ -1,5 +1,5 @@
 resource "aws_iam_account_alias" "env" {
-  account_alias = format("%s-mgmt", var.unique_prefix)
+  account_alias = format("%s-central", var.unique_prefix)
 }
 
 data "aws_iam_account_alias" "env" {

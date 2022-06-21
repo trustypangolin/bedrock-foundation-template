@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # excluding regions that have minimal support, baseline these manually
-exclude="ap-northeast-3"
+declare -a exclude=(ap-northeast-3 ap-southeast-2)
 
 # Remove existing files, and regenerate blank files
 for f in *.tf.region
@@ -14,7 +14,7 @@ aws ec2 describe-regions | jq -r '.Regions[].RegionName' | while read -r region;
 do
   for f in *.tf.region
   do
-    if [ $region == $exclude ]; then
+    if [[ ${exclude[*]} =~ "${region}" ]]; then
       echo "excluding $region"
       continue
     fi

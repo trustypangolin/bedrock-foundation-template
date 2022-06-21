@@ -3,6 +3,8 @@ yum update -y && yum upgrade -y
 timedatectl set-timezone Australia/Brisbane
 localectl set-locale LANG=en_AU.utf8
 
+yum install -y htop
+
 fallocate -l 4G /swapfile
 chmod 600 /swapfile
 mkswap /swapfile
@@ -95,9 +97,9 @@ tee /var/spool/cron/root <<EOF
 EOF
 
 chmod 600 /var/spool/cron/root
-curl https://inspector-agent.amazonaws.com/linux/latest/install --output /tmp/inspector_install
-chmod 700 /tmp/inspector_install
-/tmp/inspector_install
+# curl https://inspector-agent.amazonaws.com/linux/latest/install --output /tmp/inspector_install
+# chmod 700 /tmp/inspector_install
+# /tmp/inspector_install
 
 systemctl enable pritunl
 systemctl start pritunl

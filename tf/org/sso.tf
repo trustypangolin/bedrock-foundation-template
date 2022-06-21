@@ -5,7 +5,7 @@ resource "aws_ssoadmin_permission_set" "administrator" {
   name         = "Administrator"
   description  = "Provides AdministratorAccess permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -19,7 +19,7 @@ resource "aws_ssoadmin_permission_set" "billing" {
   name         = "Billing"
   description  = "Provides Billing permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -33,7 +33,7 @@ resource "aws_ssoadmin_permission_set" "dba" {
   name         = "DBAAdministrator"
   description  = "Provides Database Administrator permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -47,7 +47,7 @@ resource "aws_ssoadmin_permission_set" "developer" {
   name         = "Developer"
   description  = "Provides PowerUserAccess permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -61,7 +61,7 @@ resource "aws_ssoadmin_permission_set" "network" {
   name         = "NetworkAdministrator"
   description  = "Provides Network Administrator permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -75,7 +75,7 @@ resource "aws_ssoadmin_permission_set" "readonly" {
   name         = "ReadOnly"
   description  = "Provides Read Only permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -89,7 +89,7 @@ resource "aws_ssoadmin_permission_set" "sysadmin" {
   name         = "SystemAdministrator"
   description  = "Provides System Administrator permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -103,7 +103,7 @@ resource "aws_ssoadmin_permission_set" "security" {
   name         = "SecurityAdministrator"
   description  = "Provides Security Administrator permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 
@@ -117,7 +117,7 @@ resource "aws_ssoadmin_permission_set" "security_ro" {
   name         = "SecurityReadOnly"
   description  = "Provides Security Read Only permissions"
   instance_arn = tolist(data.aws_ssoadmin_instances.mgmt_sso.arns)[0]
-  // relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
+  # relay_state      = "https://s3.console.aws.amazon.com/s3/home?region={$data.aws_region.current}#"
   session_duration = "PT12H"
 }
 

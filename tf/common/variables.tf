@@ -1,6 +1,6 @@
 variable "unique_prefix" {
   type        = string
-  description = "customer name as a prefix used to be part of resource name. (e.g. itoc-vpc)"
+  description = "customer name as a prefix used to be part of resource name. (e.g. central-vpc)"
 }
 
 variable "base_region" {
@@ -9,10 +9,12 @@ variable "base_region" {
   default     = "ap-southeast-2"
 }
 
-variable "tags" {
-  description = "Tags to set on resources"
+variable "acc_map" {
+  description = "Account Name Mappings where the Account Name differs from the recommeneded names"
   type        = map(string)
   default = {
-    Version = "3.0.0"
+    "Management" = "Management"
+    "Security"   = "Security"
+    "Central"    = "Central"
   }
 }

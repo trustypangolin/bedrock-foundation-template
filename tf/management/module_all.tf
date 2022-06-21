@@ -6,15 +6,20 @@
 */
 
 module "modules_all_global" {
-  source   = "../modules/all_global/"
-  security = lookup(data.terraform_remote_state.org.outputs.acc, "Security")
-  central  = lookup(data.terraform_remote_state.org.outputs.acc, "Security")
+  source        = "gitlab.com/trustypangolin/terraform-aws-bedrock/aws//global/iam"
+  unique_prefix = var.unique_prefix
+  env           = "mgmt"
+  security      = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
+  central       = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
+  grafana_id    = var.grafana_id
 }
 
 module "modules_all_regional" {
   source        = "../modules/all_regional/"
   unique_prefix = var.unique_prefix
-  security      = lookup(data.terraform_remote_state.org.outputs.acc, "Security")
+  base_region   = var.base_region
+  security      = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
+  recorder      = true
   providers = {
     aws.ap-northeast-1 = aws.ap-northeast-1
     aws.ap-northeast-2 = aws.ap-northeast-2

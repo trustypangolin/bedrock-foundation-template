@@ -28,7 +28,7 @@ resource "aws_network_acl" "public" {
   subnet_ids = aws_subnet.public_subnets.*.id
 
   tags = {
-    Name = "${var.env}-public-nacl"
+    Name = format("%s-public-nacl", var.env)
   }
 }
 
@@ -57,7 +57,7 @@ resource "aws_network_acl" "private" {
   subnet_ids = aws_subnet.private_subnets.*.id
 
   tags = {
-    Name = "${var.env}-private-nacl"
+    Name = format("%s-private-nacl", var.env)
   }
 }
 
@@ -104,7 +104,7 @@ resource "aws_network_acl" "isolated" {
   subnet_ids = aws_subnet.isolated_subnets.*.id
 
   tags = {
-    Name = "${var.env}-isolated-nacl"
+    Name = format("%s-isolated-nacl", var.env)
   }
 }
 

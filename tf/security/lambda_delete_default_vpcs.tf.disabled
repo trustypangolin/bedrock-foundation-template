@@ -1,7 +1,7 @@
 
 #====================================================================================================
 # Description : Delete default VPCs resources (subnets/sg/rt/nacls) in all accounts and all regions
-# Author      : Itoc (Benjamin Luton)
+# Author      : Benjamin Luton
 # Date        : 2021-08-02
 # Version     : 1.0.0
 #====================================================================================================

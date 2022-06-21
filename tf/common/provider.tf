@@ -14,10 +14,9 @@ data "aws_caller_identity" "current" {}
 # Pick your default provider for the folder and delete the rest, or add aliases for mutliple account access
 
 provider "aws" {
-  region              = var.base_region
-  allowed_account_ids = [lookup(data.terraform_remote_state.org.outputs.acc, "Management")]
+  region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Management"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Management")])
     session_name = "terraform"
   }
   default_tags {
@@ -31,7 +30,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Security"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")])
     session_name = "terraform"
   }
   default_tags {
@@ -45,7 +44,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Log Archive"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Log Archive")])
     session_name = "terraform"
   }
   default_tags {
@@ -59,7 +58,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Shared"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Shared")])
     session_name = "terraform"
   }
   default_tags {
@@ -73,7 +72,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Production"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Production")])
     session_name = "terraform"
   }
   default_tags {
@@ -87,7 +86,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Staging"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Staging")])
     session_name = "terraform"
   }
   default_tags {
@@ -101,7 +100,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Testing"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Testing")])
     session_name = "terraform"
   }
   default_tags {
@@ -115,7 +114,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Development"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Development")])
     session_name = "terraform"
   }
   default_tags {
@@ -129,7 +128,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "UAT"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "UserAcceptance")])
     session_name = "terraform"
   }
   default_tags {
@@ -143,7 +142,7 @@ provider "aws" {
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "NonProd"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "NonProd")])
     session_name = "terraform"
   }
   default_tags {

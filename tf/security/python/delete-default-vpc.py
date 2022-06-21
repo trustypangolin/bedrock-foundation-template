@@ -1,7 +1,6 @@
 import boto3
 import os
 import json
-# import cfnresponse
 from botocore.exceptions import ClientError
 
 def grab_region_list():
@@ -11,8 +10,8 @@ def grab_region_list():
   return rlist
 
 def grab_org_list():
-  role = os.environ["MGMTROLE"]
-  account = os.environ["MGMTACCT"]
+  role = os.environ["ROLE"]
+  account = os.environ["ORGLIST"]
   sess = assume_role(account, 'sess', boto3.client('sts'), role)
   org = sess.client('organizations')
   paginator = org.get_paginator('list_accounts')
@@ -52,11 +51,14 @@ def handler(e, c):
           )
   if "REGIONS" not in os.environ: regions = grab_region_list()
   else: regions = os.environ["REGIONS"].split(",")
+  
   if "MEMBERACCT" not in os.environ: accounts = grab_org_list()
   else: accounts = os.environ["MEMBERACCT"].split(",")
-  if "MEMBERROLE" not in os.environ: role = "OrganizationAccountAccessRole"
+  
+  if "MEMBERROLE" not in os.environ: role = os.environ["ROLE"]
   else: role = os.environ["MEMBERROLE"]
-  print("CloudFormation Initiated with variable:", regions, accounts, role)
+  
+  print("Initiated with variable:", regions, accounts, role)
   core_functions(regions, accounts, role)
 
 def rm_vpc(s, region):
@@ -76,6 +78,7 @@ def rm_vpc(s, region):
   del_acls(ec2,args)
   del_sgps(ec2,args)
   del_vpc(ec2,vpc_id,region)
+  
 def del_igw(ec2,vpc_id):
   args={'Filters':[{'Name':'attachment.vpc-id','Values':[vpc_id]}]}
   igw=[]
@@ -88,6 +91,7 @@ def del_igw(ec2,vpc_id):
     try: ec2.delete_internet_gateway(InternetGatewayId=igw_id)
     except ClientError as e: print(e.response['Error']['Message'])
   return
+
 def del_subs(ec2,args):
   subs=[]
   try: subs=ec2.describe_subnets(**args)['Subnets']
@@ -98,6 +102,7 @@ def del_subs(ec2,args):
       try: ec2.delete_subnet(SubnetId=sub_id)
       except ClientError as e: print(e.response['Error']['Message'])
   return
+
 def del_rtbs(ec2,args):
   rtbs=[]
   try: rtbs=ec2.describe_route_tables(**args)['RouteTables']
@@ -112,6 +117,7 @@ def del_rtbs(ec2,args):
       try: ec2.delete_route_table(RouteTableId=rtb_id)
       except ClientError as e: print(e.response['Error']['Message'])
   return
+
 def del_acls(ec2,args):
   acls=[]
   try: acls=ec2.describe_network_acls(**args)['NetworkAcls']
@@ -124,6 +130,7 @@ def del_acls(ec2,args):
       try: ec2.delete_network_acl(NetworkAclId=acl_id)
       except ClientError as e: print(e.response['Error']['Message'])
     return
+
 def del_sgps(ec2,args):
   sgps=[]
   try: sgps=ec2.describe_security_groups(**args)['SecurityGroups']
@@ -136,6 +143,7 @@ def del_sgps(ec2,args):
       try: ec2.delete_security_group(GroupId=sg_id)
       except ClientError as e: print(e.response['Error']['Message'])
   return
+
 def del_vpc(ec2,vpc_id,region):
   try: ec2.delete_vpc(VpcId=vpc_id)
   except ClientError as e: print(e.response['Error']['Message'])

@@ -124,7 +124,7 @@ if __name__ == "__main__":
             "messageAttributes": {},
             "md5OfBody": "95f772fb4fcf8d6622a8a2b5cfebb127",
             "eventSource": "aws:sqs",
-            "eventSourceARN": "arn:aws:sqs:ap-southeast-2:665628331607:shared-20-lambda-ec2-snapshot-size-manager-MyQueue-1N9702JYZ9K9D",
+            "eventSourceARN": "arn:aws:sqs:ap-southeast-2:665628331607:central-20-lambda-ec2-snapshot-size-manager-MyQueue-1N9702JYZ9K9D",
             "awsRegion": "ap-southeast-2"
         }
     ]

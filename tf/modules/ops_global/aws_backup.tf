@@ -16,6 +16,11 @@ resource "aws_iam_role_policy_attachment" "backup_role_attach" {
   role       = aws_iam_role.aws_backup_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "restore_role_attach" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
+  role       = aws_iam_role.aws_backup_role.name
+}
+
 resource "aws_iam_role" "aws_backup_role" {
   name               = "AWSBackup"
   assume_role_policy = data.aws_iam_policy_document.awsbackup.json

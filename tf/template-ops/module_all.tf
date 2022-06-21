@@ -8,13 +8,13 @@
 module "modules_all_global" {
   source        = "../modules/all_global/"
   unique_prefix = var.unique_prefix
-  security      = lookup(data.terraform_remote_state.org.outputs.acc, "Security")
+  security      = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
 }
 
 module "modules_all_regional" {
   source        = "../modules/all_regional/"
   unique_prefix = var.unique_prefix
-  security      = lookup(data.terraform_remote_state.org.outputs.acc, "Security")
+  security      = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
   providers = {
     aws.ap-northeast-1 = aws.ap-northeast-1
     aws.ap-northeast-2 = aws.ap-northeast-2

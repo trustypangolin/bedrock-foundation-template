@@ -26,3 +26,23 @@ variable "grafana_id" {
 locals {
   grafana_account_id = "008923505280"
 }
+
+# For Integration with existing AWS accounts, we need to set these
+variable "password_policy" {
+  type        = bool
+  description = "Apply Default Password Policy"
+  default     = true
+}
+
+variable "public_s3_block" {
+  type        = bool
+  description = "Apply S3 Public Access Block Settings"
+  default     = true
+}
+
+variable "lambda_crossaccount_role" {
+  type        = bool
+  description = "Lambda Cross Account Role for Remediation Items"
+  default     = true
+}
+

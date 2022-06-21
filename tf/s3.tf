@@ -1,4 +1,4 @@
-// Terraform state S3 bucket
+# Terraform state S3 bucket
 resource "aws_s3_bucket" "tfstate" {
   bucket = format("%s-tfstate", var.unique_prefix)
 }
@@ -24,7 +24,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
   }
 }
 
-// Block public access
+# Block public access
 resource "aws_s3_bucket_public_access_block" "tfstate" {
   bucket                  = aws_s3_bucket.tfstate.id
   block_public_acls       = true
@@ -33,7 +33,7 @@ resource "aws_s3_bucket_public_access_block" "tfstate" {
   restrict_public_buckets = true
 }
 
-// SSL only for s3 bucket policy
+# SSL only for s3 bucket policy
 resource "aws_s3_bucket_policy" "tfstate" {
   depends_on = [aws_s3_bucket_public_access_block.tfstate]
   bucket     = aws_s3_bucket.tfstate.id
@@ -60,5 +60,4 @@ data "aws_iam_policy_document" "tfstate" {
       identifiers = ["*"]
     }
   }
-
 }

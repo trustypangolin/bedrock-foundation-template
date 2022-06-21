@@ -16,6 +16,7 @@ output "subnet_ids" {
   )
 }
 
+# Subnet Ids
 output "public_subnet_ids" {
   value = aws_subnet.public_subnets.*.id
 }
@@ -24,12 +25,17 @@ output "private_subnet_ids" {
   value = aws_subnet.private_subnets.*.id
 }
 
-output "private_subnet_cidrs" {
-  value = aws_subnet.private_subnets.*.cidr_block
-}
-
 output "isolated_subnet_ids" {
   value = aws_subnet.isolated_subnets.*.id
+}
+
+# Subnet CIDRs
+output "public_subnet_cidrs" {
+  value = aws_subnet.public_subnets.*.cidr_block
+}
+
+output "private_subnet_cidrs" {
+  value = aws_subnet.private_subnets.*.cidr_block
 }
 
 output "isolated_subnet_cidrs" {

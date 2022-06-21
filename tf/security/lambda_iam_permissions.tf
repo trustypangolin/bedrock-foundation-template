@@ -5,7 +5,7 @@ data "aws_iam_policy_document" "cross_account" {
       "sts:*",
     ]
     resources = [
-      "arn:aws:iam::*:role/somerolehere",
+      format("arn:aws:iam::*:role/%s", var.crossrole)
     ]
     effect = "Allow"
   }
@@ -183,25 +183,25 @@ data "aws_iam_policy_document" "kms" {
 
 # -- Function execution
 #--------------------------------------------------------------------------------------------------
-// data "aws_lambda_invocation" "delete_default_vpcs_invoke" {
-//   // depends_on    = [module.modules_for_all_accounts]
-//   function_name = aws_lambda_function.delete_default_vpcs_function.function_name
-//   input = <<JSON
-// {
-//   "RequestType": "Create",
-//   "ResponseURL": "http://pre-signed-S3-url-for-response",
-//   "StackId": "arn:aws:cloudformation:ap-southeast-2:123456789012:stack/MyStack/guid",
-//   "RequestId": "unique id for this create request",
-//   "ResourceType": "Custom::TestResource",
-//   "LogicalResourceId": "MyTestResource",
-//   "ResourceProperties": {
-//     "StackName": "MyStack",
-//     "List": [
-//       "1",
-//       "2",
-//       "3"
-//     ]
-//   }
-// }
-// JSON
-// }
+# data "aws_lambda_invocation" "delete_default_vpcs_invoke" {
+#   # depends_on    = [module.modules_for_all_accounts]
+#   function_name = aws_lambda_function.delete_default_vpcs_function.function_name
+#   input = <<JSON
+# {
+#   "RequestType": "Create",
+#   "ResponseURL": "http://pre-signed-S3-url-for-response",
+#   "StackId": "arn:aws:cloudformation:ap-southeast-2:123456789012:stack/MyStack/guid",
+#   "RequestId": "unique id for this create request",
+#   "ResourceType": "Custom::TestResource",
+#   "LogicalResourceId": "MyTestResource",
+#   "ResourceProperties": {
+#     "StackName": "MyStack",
+#     "List": [
+#       "1",
+#       "2",
+#       "3"
+#     ]
+#   }
+# }
+# JSON
+# }

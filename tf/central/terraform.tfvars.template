@@ -1,0 +1,69 @@
+# Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
+unique_prefix = "uniqueidentity"  
+
+# These variables are common and defaults, but can be changed if required
+base_region = "ap-southeast-2"
+
+# Org Values
+root_emails = {
+  "Security"   = "aws+bedrock.sec@domain.abc"
+  "Central"    = "aws+bedrock.central@domain.abc"
+  "Production" = "aws+bedrock.prod@domain.abc"
+}
+
+# Chnage the Value to Match the Account Names if they are different. keeps code dry, and reusable
+acc_map = {
+  "Management" = "Management"
+  "Security"   = "Security" 
+  "Central"    = "Central"
+}
+
+notifications = {
+  "billing"    = "aws+bedrock.billing@domain.abc"
+  "operations" = "aws+bedrock.operations@domain.abc"
+  "security"   = "aws+bedrock.security@domain.abc"
+}
+
+grafana_id = "111111"
+
+
+crossaccountrole = {
+  lambda         = "bedrock-MemberLambdaRemote"
+  scheduler      = "bedrock-SchedulerRemote"
+}
+
+# some lambdas have to specify the working regions, some work in just one region
+lambdaregions = {
+  ec2tagger     = "ap-southeast-2"
+  ec2snapshotsz = "ap-southeast-2"
+  ec2snapshottg = "ap-southeast-2"
+  vpcdefrules   = "ap-southeast-2"
+  scheduler     = "ap-southeast-2"
+}
+
+# each custom lambda function can be set here
+lambdacron = {
+  ec2snapshotsz = "rate(60 minutes)"
+  ec2snapshottg = "rate(60 minutes)"
+  vpcdefrules   = "rate(60 minutes)"
+}
+
+# Make sure these match the common tags + tfvars tags
+lambdaparams = {
+  ec2tagger = "Name,Environment,Service,Version"
+}
+
+# Override Defaults
+numbernatgw = "1"
+# enable_sqs_endpoint = true
+# enable_ssm_endpoint = true
+# enable_ec2messages_endpoint = true
+# enable_ec2_endpoint = true
+# enable_apigw_endpoint = true
+# enable_logs_endpoint = true
+# enable_monitoring_endpoint = true
+
+enable_ec2_vpn = false
+
+# SECRET for BEDROCK_TF_VARS 
+# awk 'NF && ! /#/' terraform.tfvars | base64

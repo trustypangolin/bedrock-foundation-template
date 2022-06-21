@@ -11,3 +11,15 @@ variable "tags" {
     IaC = "Terraform"
   }
 }
+
+variable "scheduleprod" {
+  type        = string
+  description = "Schedule Cron"
+  default     = "cron(0 4 ? * THU *)"
+}
+
+variable "schedulenonprod" {
+  type        = string
+  description = "Schedule Cron"
+  default     = "cron(0 4 ? * SUN *)"
+}

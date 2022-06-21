@@ -8,7 +8,7 @@ resource "aws_s3_bucket" "cur" {
 resource "aws_s3_bucket_logging" "cur" {
   bucket        = aws_s3_bucket.cur.id
   target_bucket = module.modules_all_regional.logging
-  target_prefix = "log/"
+  target_prefix = format("%s/", aws_s3_bucket.cur.id)
 }
 
 resource "aws_s3_bucket_acl" "cur" {
@@ -31,6 +31,23 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cur" {
     }
   }
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "cur" {
+  bucket = aws_s3_bucket.cur.id
+  rule {
+    id = "Purge Deleted"
+    filter {}
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 90
+    }
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = true
+    }
+    status = "Enabled"
+  }
+}
+
 
 resource "aws_s3_bucket_policy" "cur" {
   bucket = aws_s3_bucket.cur.id
@@ -89,7 +106,7 @@ data "aws_iam_policy_document" "cur" {
 
 resource "aws_cur_report_definition" "cur_report_definition" {
   provider                   = aws.us-east-1 # Resource only support us-east-1 region
-  report_name                = "Hourly-Cost-and-Usage-Report"
+  report_name                = "Daily-Cost-and-Usage-Report"
   time_unit                  = "DAILY"
   format                     = "Parquet"
   compression                = "Parquet"

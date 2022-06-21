@@ -1,5 +1,32 @@
-// Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
-unique_prefix    = "uniqueidentity"  
+# Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
+unique_prefix = "uniqueidentity"  
 
-// These variables are common and defaults, but can be changed if required
+# These variables are common and defaults, but can be changed if required
 base_region = "ap-southeast-2"
+
+# Org Values
+root_emails = {
+  "Security"    = "aws+bedrock.sec@domain.abc"
+  "Central"     = "aws+bedrock.central@domain.abc"
+  "Production"  = "aws+bedrock.prod@domain.abc"
+  "Development" = "aws+bedrock.dev@domain.abc"
+}
+
+acc_map = {
+  "Management"  = "Account Name Here"
+  "Security"    = "Account Name Here" 
+  "Central"     = "Account Name Here"
+  "Production"  = "Account Name Here"
+  "Development" = "Account Name Here"
+}
+
+notifications = {
+  "billing"    = "aws+bedrock.billing@domain.abc"
+  "operations" = "aws+bedrock.operations@domain.abc"
+  "security"   = "aws+bedrock.security@domain.abc"
+}
+
+grafana_id = "111111"
+
+# SECRET for BEDROCK_TF_VARS 
+# awk 'NF && ! /#/' terraform.tfvars | base64

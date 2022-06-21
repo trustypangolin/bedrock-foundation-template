@@ -11,8 +11,7 @@ resource "aws_route_table" "public_route_tables" {
   count  = local.number_of_azs
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "${var.env}-public-rt-${data.aws_availability_zone.az[count.index].name_suffix}"
-    #Name  = "${var.unique_prefix}-${var.workload_environment}-public-rt-${trimprefix(local.azs[count.index], data.aws_region.current.name)}"
+    Name = format("%s-public-rt-%s", var.env, data.aws_availability_zone.az[count.index].name_suffix)
   }
 }
 
@@ -35,8 +34,7 @@ resource "aws_route_table" "private_route_tables" {
   count  = local.number_of_priv_subnets
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "${var.env}-private-rt-${data.aws_availability_zone.az[count.index].name_suffix}"
-    #Name  = "${var.unique_prefix}-${var.workload_environment}-private-rt-${trimprefix(local.azs[count.index], data.aws_region.current.name)}"
+    Name = format("%s-private-rt-%s", var.env, data.aws_availability_zone.az[count.index].name_suffix)
   }
 }
 
@@ -75,8 +73,7 @@ resource "aws_route_table" "isolated_route_tables" {
   count  = local.number_of_sec_subnets
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name = "${var.env}-isolated-rt-${data.aws_availability_zone.az[count.index].name_suffix}"
-    #Name  = "${var.unique_prefix}-${var.workload_environment}-isolated-rt-${trimprefix(local.azs[count.index], data.aws_region.current.name)}"
+    Name = format("%s-isolated-rt-%s", var.env, data.aws_availability_zone.az[count.index].name_suffix)
   }
 }
 

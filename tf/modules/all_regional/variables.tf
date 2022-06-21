@@ -9,14 +9,6 @@ variable "base_region" {
   default     = "ap-southeast-2"
 }
 
-variable "tags" {
-  description = "Tags to set on resources"
-  type        = map(string)
-  default = {
-    IaC = "Terraform"
-  }
-}
-
 variable "recorder" {
   description = "Activate Recorder"
   type        = bool
@@ -38,4 +30,10 @@ variable "expire" {
   description = "Logging Bucket Days before deletion"
   type        = number
   default     = 3
+}
+
+variable "sns_topic" {
+  type        = string
+  description = "SNS Topics"
+  default     = null
 }

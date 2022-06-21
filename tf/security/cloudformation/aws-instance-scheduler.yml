@@ -5,13 +5,13 @@
 # Date        : 2022-03-04
 # Version     : 1.0.0
 # Command Line:
-# aws cloudformation --profile %CUSTOMERPREFIX%-shared-admin \
-# aws cloudformation --profile v2-shared-sso \
+# aws cloudformation --profile %CUSTOMERPREFIX%-central-admin \
+# aws cloudformation --profile v2-central-sso \
 #                    deploy \
-#                    --stack-name bedrock-shared-lambda-instance-scheduler \
-#                    --template-file ./02-shared-services/03-custom-lambda/shared-25-lambda-instance-scheduler.yml \
+#                    --stack-name bedrock-central-lambda-instance-scheduler \
+#                    --template-file ./02-central-services/03-custom-lambda/central-25-lambda-instance-scheduler.yml \
 #                    --capabilities CAPABILITY_NAMED_IAM \
-#                    --tags Version=1.0.0 Service=bedrock Environment=Shared \
+#                    --tags Version=1.0.0 Service=bedrock Environment=Central \
 #                    --parameter-overrides AuditAccountId=%AUDITACCOUNT% \
 #                                          Regions=ap-southeast-2,ap-southeast-1
 #                                          CrossAccountRoles=arn:aws:iam::%AUDITACCOUNT%:role/SchedulerRemote

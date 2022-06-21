@@ -9,6 +9,17 @@ variable "unique_prefix" {
   description = "prefix used to be part of resource name"
 }
 
+variable "acc_map" {
+  description = "Account Name Mappings where the Account Name differs from the recommeneded names"
+  type        = map(string)
+  default = {
+    "Management"  = "Management"
+    "Security"    = "Security"
+    "Central"     = "Central"
+    "Development" = "Development"
+  }
+}
+
 variable "tags" {
   description = "Tags to set on resources"
   type        = map(string)

@@ -10,7 +10,7 @@ resource "aws_sns_topic_policy" "bedrock-operations" {
 resource "aws_sns_topic_subscription" "bedrock-operations" {
   topic_arn = aws_sns_topic.bedrock-operations.arn
   protocol  = "email"
-  endpoint  = var.notifications.operations
+  endpoint  = var.notifications["operations"]
 }
 
 resource "aws_sns_topic" "bedrock-security" {
@@ -25,7 +25,7 @@ resource "aws_sns_topic_policy" "bedrock-security" {
 resource "aws_sns_topic_subscription" "bedrock-security" {
   topic_arn = aws_sns_topic.bedrock-security.arn
   protocol  = "email"
-  endpoint  = var.notifications.security
+  endpoint  = var.notifications["security"]
 }
 
 resource "aws_sns_topic" "bedrock-deadletter" {

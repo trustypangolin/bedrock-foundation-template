@@ -1,8 +1,11 @@
 terraform {
   backend "s3" {
-    // bucket      = "%unique_prefix%-tfstate"  # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="bucket=uniqueidentity-tfstate"
-    // key         = "org"                      # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="key=environment"
-    region         = "ap-southeast-2"
+    # bucket      = "%unique_prefix%-tfstate"  # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="bucket=uniqueidentity-tfstate"
+    # key         = "org"                      # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="key=environment"
+    # region      = "ap-southeast-2"           # we send this as a command line param, so this isnt needed, eg terraform init -backend-config="region=ap-southeast-2"
     dynamodb_table = "bedrock-tfstate"
   }
 }
+
+# SECRET for BEDROCK_TF_STATE 
+# awk 'NF && ! /#/' remote_state.tf | base64

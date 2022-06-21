@@ -2,14 +2,16 @@ locals {
   members = {
     # "Management" = data.aws_organizations_organization.org.roots[0].id
     "Security"   = data.aws_organizations_organizational_units.org.children[0].id
-    "Shared"     = data.aws_organizations_organizational_units.org.children[1].id
+    "Central"    = data.aws_organizations_organizational_units.org.children[1].id
     "Production" = data.aws_organizations_organizational_units.org.children[1].id
+    # "Development" = data.aws_organizations_organizational_units.org.children[1].id
   }
 }
 
 # terraform import aws_organizations_organization.org r-abcde
 resource "aws_organizations_organization" "org" {
   aws_service_access_principals = [
+    "access-analyzer.amazonaws.com",
     "account.amazonaws.com",
     "auditmanager.amazonaws.com",
     "aws-artifact-account-sync.amazonaws.com",
@@ -67,15 +69,15 @@ resource "aws_organizations_organizational_unit" "operational" {
   tags      = var.tags
 }
 
-# # For precreated accounts, import the following resources first
-# # terraform import aws_organizations_account.members[\"Management\"] 111222333444
+# For precreated accounts, import the following resources first
+# terraform import 'aws_organizations_account.members["Development"]' 111222333444
 
-# # For Control Tower, import the following resources first
-# # terraform import aws_organizations_account.members[\"Log\ Archive\"] 333444555666
-# # terraform import aws_organizations_account.members[\"Audit\"] 222333444555
+# For Control Tower, import the following resources first
+# terraform import 'aws_organizations_account.members["Log Archive"]' 333444555666
+# terraform import 'aws_organizations_account.members["Audit"]' 222333444555
 resource "aws_organizations_account" "members" {
   for_each  = var.root_emails
-  name      = each.key
+  name      = lookup(var.acc_map, each.key)
   email     = each.value
   parent_id = lookup(local.members, each.key)
   role_name = "bedrock-terraform"

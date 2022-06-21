@@ -25,7 +25,7 @@ resource "aws_security_group" "linux-mgmt-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${var.env}-linux-mgmt-sg"
+    Name = format("%s-linux-mgmt-sg", var.env)
   }
 }
 
@@ -51,6 +51,6 @@ resource "aws_security_group" "windows-mgmt-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = {
-    Name = "${var.env}-windows-mgmt-sg"
+    Name = format("%s-windows-mgmt-sg", var.env)
   }
 }

@@ -39,17 +39,17 @@ trigger_security:
         - tf/security/*
       if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
 
-trigger_shared:
+trigger_central:
   needs:
     - trigger_org
   stage: triggers
   trigger:
-    include: tf/shared/.gitlab-ci.yml
+    include: tf/central/.gitlab-ci.yml
   variables:
-    ENVIRONMENT: shared
+    ENVIRONMENT: central
   rules:
     - changes:
-        - tf/shared/*
+        - tf/central/*
       if: '$CI_PIPELINE_SOURCE != "merge_request_event"'
 
 trigger_production:

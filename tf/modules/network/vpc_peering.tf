@@ -1,4 +1,4 @@
-# #Peering connection between shared account to operational accounts
+# #Peering connection between central account to operational accounts
 # resource "aws_vpc_peering_connection" "vpc_peering" {
 #   count         = var.enable_vpc_peering == true && length(var.vpc_peering_connections) > 0 ? length(var.vpc_peering_connections) : 0
 #   peer_owner_id = var.vpc_peering_connections[count.index].peer_account_id
@@ -15,7 +15,7 @@
 #   // }
 #   tags = merge(
 #     {
-#       Name = "${var.env}-shared-to-${var.vpc_peering_connections[count.index].account_alias}-pcx"
+#       Name = "${var.env}-central-to-${var.vpc_peering_connections[count.index].account_alias}-pcx"
 #     },
 #     var.tags
 #   )

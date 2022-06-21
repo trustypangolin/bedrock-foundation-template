@@ -6,14 +6,16 @@
 */
 
 module "modules_all_global" {
-  source   = "../modules/all_global/"
-  security = data.aws_caller_identity.current.account_id
-  central  = data.aws_caller_identity.current.account_id
+  source     = "../modules/all_global/"
+  security   = data.aws_caller_identity.current.account_id
+  central    = data.aws_caller_identity.current.account_id
+  grafana_id = var.grafana_id
 }
 
 module "modules_all_regional" {
   source        = "../modules/all_regional/"
   unique_prefix = var.unique_prefix
+  base_region   = var.base_region
   security      = data.aws_caller_identity.current.account_id
   aggregate     = data.terraform_remote_state.org.outputs.all_accounts_ids
   recorder      = true
@@ -36,3 +38,4 @@ module "modules_all_regional" {
     aws.us-west-2      = aws.us-west-2
   }
 }
+

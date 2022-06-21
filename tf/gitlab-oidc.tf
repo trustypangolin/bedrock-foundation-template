@@ -10,6 +10,7 @@ resource "aws_iam_openid_connect_provider" "gitlab" {
 }
 
 data "aws_iam_policy_document" "assume-role-policy-gitlab" {
+  count = var.gitlab == true ? 1 : 0
   statement {
     sid     = "AllowGitLab"
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -29,7 +30,7 @@ data "aws_iam_policy_document" "assume-role-policy-gitlab" {
 resource "aws_iam_role" "gitlab_ci" {
   count                = var.gitlab == true ? 1 : 0
   name                 = "GitLab-Bootstrap"
-  assume_role_policy   = data.aws_iam_policy_document.assume-role-policy-gitlab.json
+  assume_role_policy   = data.aws_iam_policy_document.assume-role-policy-gitlab[0].json
   max_session_duration = 3600
   inline_policy {
     name   = "GitlabAssume"

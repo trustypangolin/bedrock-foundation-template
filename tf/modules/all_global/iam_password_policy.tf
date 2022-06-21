@@ -1,4 +1,5 @@
 resource "aws_iam_account_password_policy" "strict" {
+  count                          = var.password_policy == true ? 1 : 0
   minimum_password_length        = 14
   require_lowercase_characters   = true
   require_numbers                = true

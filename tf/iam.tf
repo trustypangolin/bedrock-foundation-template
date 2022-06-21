@@ -6,39 +6,39 @@ resource "aws_iam_role" "bedrock" {
 }
 
 data "aws_iam_policy_document" "bedrock_trust" {
-    dynamic "statement" {
-    for_each = var.gitlab ? [1] :[] 
+  dynamic "statement" {
+    for_each = var.gitlab ? [1] : []
     content {
       actions = [
         "sts:AssumeRole"
       ]
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.gitlab_ci[0].arn ]
+        identifiers = [aws_iam_role.gitlab_ci[0].arn]
       }
     }
   }
-    dynamic "statement" {
-    for_each = var.github ? [1] :[] 
+  dynamic "statement" {
+    for_each = var.github ? [1] : []
     content {
       actions = [
         "sts:AssumeRole"
       ]
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.github_ci[0].arn ]
+        identifiers = [aws_iam_role.github_ci[0].arn]
       }
     }
   }
-    dynamic "statement" {
-    for_each = var.bitbucket ? [1] :[] 
+  dynamic "statement" {
+    for_each = var.bitbucket ? [1] : []
     content {
       actions = [
         "sts:AssumeRole"
       ]
       principals {
         type        = "AWS"
-        identifiers = [aws_iam_role.bitbucket_ci[0].arn ]
+        identifiers = [aws_iam_role.bitbucket_ci[0].arn]
       }
     }
   }

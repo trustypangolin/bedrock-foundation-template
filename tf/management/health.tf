@@ -10,7 +10,7 @@ resource "aws_sns_topic_policy" "ops" {
 resource "aws_sns_topic_subscription" "ops" {
   topic_arn = aws_sns_topic.ops.arn
   protocol  = "email"
-  endpoint  = var.notifications.operations
+  endpoint  = var.notifications["operations"]
 }
 
 data "aws_iam_policy_document" "sns_topic_policy" {

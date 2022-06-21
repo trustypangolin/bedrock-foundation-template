@@ -4,68 +4,68 @@ resource "aws_flow_log" "flow_log_all" {
   log_destination_type = "s3"
   traffic_type         = "ALL"
   vpc_id               = aws_vpc.vpc.id
+  tags = {
+    Name = format("%s-s3", var.env)
+  }
 }
 
 ### Flow log resources
 resource "aws_flow_log" "flow_log_cw" {
-  iam_role_arn         = aws_iam_role.log-group-role.arn
-  log_destination      = aws_cloudwatch_log_group.log_group.arn
+  count                = var.create_log_group == true ? 1 : 0
+  iam_role_arn         = aws_iam_role.log-group-role[0].arn
+  log_destination      = aws_cloudwatch_log_group.log_group[0].arn
   log_destination_type = "cloud-watch-logs"
   traffic_type         = "ALL"
   vpc_id               = aws_vpc.vpc.id
+  tags = {
+    Name = format("%s-cloudwatch-log-group", var.env)
+  }
 }
 
 resource "aws_cloudwatch_log_group" "log_group" {
+  count             = var.create_log_group == true ? 1 : 0
   name              = "/aws/vpc/flow-logs"
   retention_in_days = "3"
   tags = {
-    Name = "${var.env}-flow-logs-log-group"
+    Name = format("%s-flow-logs-log-group", var.env)
   }
-
 }
 
 
 resource "aws_iam_role" "log-group-role" {
-  # count = var.create_log_group_iam_role == true ? 1 : 0
-  name = "${var.env}-cloudwatch-log-group-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "",
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "vpc-flow-logs.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-}
-EOF
+  count              = var.create_log_group == true ? 1 : 0
+  name               = format("bedrock-cloudwatch-vpc-%s", data.aws_region.current.name)
+  assume_role_policy = data.aws_iam_policy_document.flow_logs.json
+  inline_policy {
+    name   = "vpc-cloudwatch-log-group-policy"
+    policy = data.aws_iam_policy_document.log-group-policy.json
+  }
 }
 
-resource "aws_iam_role_policy" "log-group-policy" {
-  # count  = var.create_log_group_iam_role == true ? 1 : 0
-  name   = "${var.env}-cloudwatch-log-group-policy"
-  role   = aws_iam_role.log-group-role.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-        "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
+data "aws_iam_policy_document" "flow_logs" {
+  statement {
+    sid = "AssumeFromFlowLogs"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["vpc-flow-logs.amazonaws.com"]
     }
-  ]
+  }
 }
-EOF
+
+data "aws_iam_policy_document" "log-group-policy" {
+  statement {
+    sid = "FlowLogstoCWLG"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
 }

@@ -1,6 +1,6 @@
 #====================================================================================================
 # Description : Terraform state files for this project are stored in S3 with locking done using a DynamoDB table in Management Account.
-# Author      : Itoc (Benjamin Luton)
+# Author      : Benjamin Luton
 # Date        : 2021-08-01
 # Version     : 1.0.0
 #====================================================================================================
@@ -20,14 +20,14 @@
 // }
 
 # ============= import the outputs (network ids) from org remote state ======================================
-data "terraform_remote_state" "shared" {
+data "terraform_remote_state" "central" {
   backend = "s3"
   config = {
     bucket = join("-", [
       var.customer_prefix,
       "tfstate"
     ])
-    key            = "shared"
+    key            = "central"
     region         = "ap-southeast-2"
     dynamodb_table = "bedrock-tfstate"
   }

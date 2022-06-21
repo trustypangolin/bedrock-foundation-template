@@ -1,7 +1,7 @@
 resource "aws_cloudtrail" "org_cloudtrail" {
   name                          = format("%s-cloudtrail", var.unique_prefix)
   s3_bucket_name                = format("%s-cloudtrail", var.unique_prefix)
-  kms_key_id                    = format("arn:aws:kms:%s:%s:alias/security", var.base_region, lookup(data.terraform_remote_state.org.outputs.acc, "Security"))
+  kms_key_id                    = format("arn:aws:kms:%s:%s:alias/security", var.base_region, data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")])
   include_global_service_events = true
   is_multi_region_trail         = true
   is_organization_trail         = true

@@ -1,6 +1,6 @@
 variable "unique_prefix" {
   type        = string
-  description = "customer name as a prefix used to be part of resource name. (e.g. itoc-vpc)"
+  description = "customer name as a prefix used to be part of resource name."
 }
 
 variable "base_region" {

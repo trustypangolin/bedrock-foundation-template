@@ -9,12 +9,13 @@ terraform {
 }
 
 data "aws_regions" "current" {}
+data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 provider "aws" {
   region = var.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Management"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Management")])
     session_name = "terraform"
   }
   default_tags {

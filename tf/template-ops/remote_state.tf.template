@@ -1,6 +1,8 @@
 terraform {
   backend "s3" {
-    region         = "ap-southeast-2"
     dynamodb_table = "bedrock-tfstate"
   }
 }
+
+# SECRET for BEDROCK_TF_STATE 
+# awk 'NF && ! /#/' remote_state.tf | base64

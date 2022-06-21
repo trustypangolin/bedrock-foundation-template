@@ -2,7 +2,7 @@ provider "aws" {
   region = "replace"
   alias  = "replace"
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", lookup(data.terraform_remote_state.org.outputs.acc, "Production"))
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Production")])
     session_name = "terraform"
   }
   default_tags {

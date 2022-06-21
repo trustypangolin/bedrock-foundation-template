@@ -6,6 +6,12 @@ resource "aws_s3_bucket" "log_bucket" {
   #checkov:skip=CKV_AWS_18:This is the logging bucket
 }
 
+resource "aws_s3_bucket_logging" "log_bucket" {
+  bucket        = aws_s3_bucket.log_bucket.id
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = format("%s/", aws_s3_bucket.log_bucket.id)
+}
+
 resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
   rule {
@@ -17,6 +23,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_bucket" {
     status = "Enabled"
   }
 }
+
 resource "aws_s3_bucket_acl" "log_bucket" {
   bucket = aws_s3_bucket.log_bucket.id
   acl    = "log-delivery-write"
@@ -57,7 +64,23 @@ data "aws_iam_policy_document" "log_bucket" {
       values   = ["false"]
     }
   }
+
+  statement {
+    sid = "AllowLoggingLRequests"
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      format("%s/*", aws_s3_bucket.log_bucket.arn)
+    ]
+  }
 }
+
 resource "aws_s3_bucket_public_access_block" "log_bucket" {
   bucket                  = aws_s3_bucket.log_bucket.id
   block_public_acls       = true

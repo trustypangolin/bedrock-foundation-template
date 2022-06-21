@@ -1,28 +1,28 @@
 ###### S3 Gateway 
 resource "aws_vpc_endpoint" "s3" {
   vpc_id       = aws_vpc.vpc.id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
+  service_name = format("com.amazonaws.%s.s3", data.aws_region.current.name)
   route_table_ids = concat(
     aws_route_table.public_route_tables.*.id,
     aws_route_table.private_route_tables.*.id,
     aws_route_table.isolated_route_tables.*.id
   )
   tags = {
-    Name = "${var.env}-s3-vpce"
+    Name = format("%s-s3-vpce", var.env)
   }
 }
 
 ###### DynamoDB Gateway 
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id       = aws_vpc.vpc.id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+  service_name = format("com.amazonaws.%s.dynamodb", data.aws_region.current.name)
   route_table_ids = concat(
     aws_route_table.public_route_tables.*.id,
     aws_route_table.private_route_tables.*.id,
     aws_route_table.isolated_route_tables.*.id
   )
   tags = {
-    Name = "${var.env}-dynamodb-vpce"
+    Name = format("%s-dynamodb-vpce", var.env)
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_security_group" "vpc_endpoint_sg" {
   vpc_id      = aws_vpc.vpc.id
   description = "Allow traffic through VPC Endpoint"
   tags = {
-    Name = "${var.env}-vpc-endpoint-sg"
+    Name = format("%s-vpc-endpoint-sg", var.env)
   }
 }
 
@@ -54,14 +54,14 @@ resource "aws_vpc_endpoint" "ssm" {
   count = var.enable_ssm_endpoint ? 1 : 0
 
   vpc_id            = aws_vpc.vpc.id
-  service_name      = "com.amazonaws.${data.aws_region.current.name}.ssm"
+  service_name      = format("com.amazonaws.%s.ssm", data.aws_region.current.name)
   vpc_endpoint_type = "Interface"
 
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-ssm-vpce"
+    Name = format("%s-ssm-vpce", var.env)
   }
 }
 
@@ -72,13 +72,13 @@ resource "aws_vpc_endpoint" "ssmmessages" {
   count = var.enable_ssm_endpoint ? 1 : 0
 
   vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.ssmmessages"
+  service_name        = format("com.amazonaws.%s.ssmmessages", data.aws_region.current.name)
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-ssm-messages-vpce"
+    Name = format("%s-ssm-messages-vpce", var.env)
   }
 }
 
@@ -89,13 +89,13 @@ resource "aws_vpc_endpoint" "ec2messages" {
   count = var.enable_ec2messages_endpoint || var.enable_ssm_endpoint ? 1 : 0
 
   vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2messages"
+  service_name        = format("com.amazonaws.%s.ec2messages", data.aws_region.current.name)
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-ec2-messages-vpce"
+    Name = format("%s-ec2-messages-vpce", var.env)
   }
 }
 
@@ -106,13 +106,13 @@ resource "aws_vpc_endpoint" "ec2" {
   count = var.enable_ec2_endpoint ? 1 : 0
 
   vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.ec2"
+  service_name        = format("com.amazonaws.%s.ec2", data.aws_region.current.name)
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-ec2-vpce"
+    Name = format("%s-ec2-vpce", var.env)
   }
 }
 
@@ -133,7 +133,7 @@ resource "aws_vpc_endpoint" "apigw" {
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-api-gateway-vpce"
+    Name = format("%s-api-gateway-vpce", var.env)
   }
 }
 
@@ -143,13 +143,13 @@ resource "aws_vpc_endpoint" "apigw" {
 resource "aws_vpc_endpoint" "logs" {
   count               = var.enable_logs_endpoint ? 1 : 0
   vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.logs"
+  service_name        = format("com.amazonaws.%s.logs", data.aws_region.current.name)
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-cloudwatch-log-vpce"
+    Name = format("%s-cloudwatch-log-vpce", var.env)
   }
 }
 
@@ -160,12 +160,12 @@ resource "aws_vpc_endpoint" "monitoring" {
   count = var.enable_monitoring_endpoint ? 1 : 0
 
   vpc_id              = aws_vpc.vpc.id
-  service_name        = "com.amazonaws.${data.aws_region.current.name}.monitoring"
+  service_name        = format("com.amazonaws.%s.monitoring", data.aws_region.current.name)
   vpc_endpoint_type   = "Interface"
   security_group_ids  = [aws_security_group.vpc_endpoint_sg.id]
   subnet_ids          = aws_subnet.private_subnets.*.id
   private_dns_enabled = true
   tags = {
-    Name = "${var.env}-Cloudwatch-monitoring-vpce"
+    Name = format("%s-cloudwatch-monitoring-vpce", var.env)
   }
 }

@@ -21,6 +21,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudtrail" {
   }
 }
 
+resource "aws_s3_bucket_logging" "cloudtrail" {
+  bucket        = aws_s3_bucket.cloudtrail.id
+  target_bucket = module.modules_all_regional.logging
+  target_prefix = format("%s/", aws_s3_bucket.cloudtrail.id)
+}
+
 resource "aws_s3_bucket_policy" "cloudtrail" {
   bucket = aws_s3_bucket.cloudtrail.id
   policy = data.aws_iam_policy_document.cloudtrail.json

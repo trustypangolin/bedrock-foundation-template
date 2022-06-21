@@ -3,16 +3,13 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-data "aws_region" "current" {}
-# data "aws_caller_identity" "current" {}
-
 # ---------------- for VPC ------------------
-
 locals {
   vpc_cidr               = format("%s.0.0/16", var.network_prefix)
-  subnet_cidrs           = cidrsubnets(local.vpc_cidr, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
+  subnet_cidrs           = cidrsubnets(local.vpc_cidr, 4, 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4)
+  subnet_cidrs_b         = cidrsubnets(local.vpc_cidr, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)
   azs                    = data.aws_availability_zones.available.names
-  number_of_azs          = length(data.aws_availability_zones.available.names)
+  number_of_azs          = length(data.aws_availability_zones.available.names) > 4 ? 4 : length(data.aws_availability_zones.available.names)
   number_of_pub_subnets  = length(aws_subnet.public_subnets[*])
   number_of_priv_subnets = length(aws_subnet.private_subnets[*])
   number_of_sec_subnets  = length(aws_subnet.isolated_subnets[*])
@@ -29,13 +26,18 @@ variable "instance_tenancy" {
 }
 
 variable "env" {
-  description = "Workload environment (e.g. shared)"
+  description = "Workload environment (e.g. central)"
   type        = string
 }
 
 variable "flow_log_bucket_arn" {
   type    = string
   default = ""
+}
+
+variable "create_log_group" {
+  type    = bool
+  default = true
 }
 
 # ---------------- for NAT Gateway ------------------

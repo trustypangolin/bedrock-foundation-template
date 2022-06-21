@@ -3,9 +3,9 @@ data "tls_certificate" "github" {
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
-  count           = var.github == true ? 1 : 0
-  url             = "https://token.actions.githubusercontent.com"
-  client_id_list  = ["sts.amazonaws.com"]
+  count          = var.github == true ? 1 : 0
+  url            = "https://token.actions.githubusercontent.com"
+  client_id_list = ["sts.amazonaws.com"]
   thumbprint_list = [
     data.tls_certificate.github.certificates.2.sha1_fingerprint,
     "6938fd4d98bab03faadb97b34396831e3780aea1"
@@ -13,6 +13,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 data "aws_iam_policy_document" "assume-role-policy-github" {
+  count = var.github == true ? 1 : 0
   statement {
     sid     = "AllowGitHub"
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -32,7 +33,7 @@ data "aws_iam_policy_document" "assume-role-policy-github" {
 resource "aws_iam_role" "github_ci" {
   count                = var.github == true ? 1 : 0
   name                 = "Github-Bootstrap"
-  assume_role_policy   = data.aws_iam_policy_document.assume-role-policy-github.json
+  assume_role_policy   = data.aws_iam_policy_document.assume-role-policy-github[0].json
   max_session_duration = 3600
   inline_policy {
     name   = "GithubAssume"

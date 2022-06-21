@@ -1,6 +1,6 @@
 variable "unique_prefix" {
   type        = string
-  description = "customer name as a prefix used to be part of resource name. (e.g. itoc-vpc)"
+  description = "customer name as a prefix used to be part of resource name."
 }
 
 variable "base_region" {
@@ -9,38 +9,35 @@ variable "base_region" {
   default     = "ap-southeast-2"
 }
 
-variable "tags" {
-  description = "Tags to set on resources"
+variable "acc_map" {
+  description = "Account Name Mappings where the Account Name differs from the recommeneded names"
   type        = map(string)
   default = {
-    IaC = "Terraform"
+    "Management"  = "Management"
+    "Security"    = "Security"
+    "Central"     = "Central"
+    "Production"  = "Production"
+    "Development" = "Development"
   }
 }
 
 variable "vpccidr" {
   type        = string
   description = "/16 subnet prefix"
-  default     = "10.1"
+  default     = "10.10"
 }
-# variable "resourcetag" {
-#   description = "tagged resources"
-#   type        = string
-#   default     = "production"
-# }
 
-# variable "cidrprefix" {
-#   description = "CIDR range"
-#   type        = string
-#   default     = "10.100"
-# }
+variable "grafana_id" {
+  type        = string
+  description = "This is your Grafana Cloud identifier and is used for security purposes."
+  validation {
+    condition     = length(var.grafana_id) > 0
+    error_message = "ExternalID is required."
+  }
+}
 
-# variable "numbernatgw" {
-#   description = "Number of NAT Gateways"
-#   type        = string
-#   default     = 0
-# }
-
-# variable "log_group" {
-#   type        = string
-#   description = "log_group of cloudtrail"
-# }
+variable "env" {
+  type        = string
+  description = "Tag identifier for Operation Account resources"
+  default     = "production"
+}

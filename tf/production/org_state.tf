@@ -4,7 +4,7 @@ data "terraform_remote_state" "org" {
   config = {
     bucket         = format("%s-tfstate", var.unique_prefix)
     key            = "org"
-    region         = "ap-southeast-2"
+    region         = var.base_region
     dynamodb_table = "bedrock-tfstate"
   }
 }

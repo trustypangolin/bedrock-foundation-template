@@ -1,9 +1,9 @@
 # Network Module
 Provisions a VPC with:
-1. A /16 CIDR range, with 9 or 12 (depending on number of AZs availible) /20 subnets (for public, private and secure).
+1. A /16 CIDR range, with 9 or 12 (depending on number of AZs availible) /20,/19,/20 subnets (for public, private and isolated).
 2. Gateway endpoints for DynamoDB and S3.
 3. S3 and Dynamo Gateway endpoints.
-4. Routing tables and NACLs that implements Itoc's public, private and secure subnet methodology.
+4. Routing tables and NACLs that implements public, private and isolated subnet methodology.
 5. NAT Gateways + EIPs for the private subnets.
 
 
@@ -30,7 +30,7 @@ module "vpc" {
     # -------- Transit Gateway -------------------
     create_tgw                      = true/false
     amazon_side_asn                 = amazon_side_asn number - required if create_tgw = true
-    auto_accept_shared_attachments  = enable/disable - required if create_tgw = true
+    auto_accept_central_attachments  = enable/disable - required if create_tgw = true
     default_route_table_association = enable/disable - required if create_tgw = true
     default_route_table_propagation = enable/disable - required if create_tgw = true
     vpn_ecmp_support                = enable/disable - required if create_tgw = true
@@ -42,7 +42,7 @@ module "vpc" {
     propagate_attachments           = true/false
     custom_routes                   = [tgw_static_routes] if additional static route excluding the blackhole route
     tgw_route_table_blackhole_cidr  = var.tgw_blackhole_route
-    custom_routes_to_tgw            = [] Route table routes for Secure, Public and Private Route Tables to direct internal traffic to TGW
+    custom_routes_to_tgw            = [] Route table routes for Isolated, Public and Private Route Tables to direct internal traffic to TGW
     tgwpeer_account_id              = aws_account_id of tgw peer
     create_tgw_peering              = true/false
     tgw_peer_region                 = ""

@@ -1,3 +1,15 @@
+resource "aws_organizations_delegated_administrator" "config" {
+  provider          = aws.management
+  account_id        = data.aws_caller_identity.current.account_id
+  service_principal = "config.amazonaws.com"
+}
+
+resource "aws_organizations_delegated_administrator" "config-multi" {
+  provider          = aws.management
+  account_id        = data.aws_caller_identity.current.account_id
+  service_principal = "config-multiaccountsetup.amazonaws.com"
+}
+
 resource "aws_s3_bucket" "config_delivery" {
   bucket = format("%s-config-recordings", var.unique_prefix)
 }
@@ -19,6 +31,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "config_delivery" 
       kms_master_key_id = aws_kms_key.security_cmk.arn
     }
   }
+}
+
+resource "aws_s3_bucket_logging" "config_delivery" {
+  bucket        = aws_s3_bucket.config_delivery.id
+  target_bucket = module.modules_all_regional.logging
+  target_prefix = format("%s/", aws_s3_bucket.config_delivery.id)
 }
 
 resource "aws_s3_bucket_policy" "config_delivery" {
