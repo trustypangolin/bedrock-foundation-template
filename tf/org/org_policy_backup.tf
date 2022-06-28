@@ -39,7 +39,7 @@ resource "aws_organizations_policy" "r1" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -58,7 +58,7 @@ resource "aws_organizations_policy" "r1" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -77,7 +77,7 @@ resource "aws_organizations_policy" "r1" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -96,7 +96,7 @@ resource "aws_organizations_policy" "r1" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -161,7 +161,7 @@ resource "aws_organizations_policy" "r2" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -180,7 +180,7 @@ resource "aws_organizations_policy" "r2" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -199,7 +199,7 @@ resource "aws_organizations_policy" "r2" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -218,7 +218,7 @@ resource "aws_organizations_policy" "r2" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -283,7 +283,7 @@ resource "aws_organizations_policy" "r3" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -302,7 +302,7 @@ resource "aws_organizations_policy" "r3" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -321,7 +321,7 @@ resource "aws_organizations_policy" "r3" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {
@@ -340,7 +340,7 @@ resource "aws_organizations_policy" "r3" {
             "@@assign": "180"
           },
           "target_backup_vault_name": {
-            "@@assign": "AWSBackup"
+            "@@assign": "Default"
           },
           "lifecycle": {
             "delete_after_days": {

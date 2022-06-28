@@ -1,29 +1,3 @@
-# Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
-unique_prefix = "uniqueidentity"  
-
-# These variables are common and defaults, but can be changed if required
-base_region = "ap-southeast-2"
-
-# Org Values
-root_emails = {
-  "Security"   = "aws+bedrock.sec@domain.abc"
-  "Central"    = "aws+bedrock.central@domain.abc"
-  "Production" = "aws+bedrock.prod@domain.abc"
-}
-
-# Chnage the Value to Match the Account Names if they are different. keeps code dry, and reusable
-acc_map = {
-  "Management" = "Management"
-  "Security"   = "Security" 
-  "Central"    = "Central"
-}
-
-notifications = {
-  "billing"    = "aws+bedrock.billing@domain.abc"
-  "operations" = "aws+bedrock.operations@domain.abc"
-  "security"   = "aws+bedrock.security@domain.abc"
-}
-
 grafana_id = "111111"
 
 

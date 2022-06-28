@@ -1,18 +1,30 @@
+# Mandatory Variables - This must be globally unique, S3 Terraform State will be stored here
+variable "unique_prefix" {
+  type        = string
+  description = "unique prefix used to be part of resource name"
+}
+
+variable "source_account" {
+  type        = string
+  description = "Source SSO Account you are building from, This will be added to the OIDC trust"
+  default     = null
+}
+
+# Optional Variables - These are retrieved from terraform.tfvars
 variable "base_region" {
   type        = string
   description = "AWS region to operate in. Defaults to ap-southeast-2 (Sydney)."
   default     = "ap-southeast-2"
 }
 
-variable "unique_prefix" {
-  type        = string
-  description = "unique prefix used to be part of resource name"
-}
-
 # GitLab OIDC variables
-variable "gitlab" {
+variable "gitlab_role" {
   type    = bool
-  default = true
+  default = false
+}
+variable "gitlab_idp" {
+  type    = bool
+  default = false
 }
 
 variable "gitlab_url" {
@@ -31,18 +43,25 @@ variable "gitlab_field" {
 }
 
 variable "gitlab_match" {
-  type = list(any)
+  type    = string
+  default = null
 }
 
 
 # GitHub OIDC variables
-variable "github" {
+variable "github_role" {
   type    = bool
-  default = true
+  default = false
+}
+
+variable "github_idp" {
+  type    = bool
+  default = false
 }
 
 variable "github_match" {
-  type = list(string)
+  type    = string
+  default = null
 }
 
 variable "github_field" {
@@ -50,17 +69,24 @@ variable "github_field" {
   default = "sub"
 }
 
+
 # BitBucket OIDC variables
-variable "bitbucket" {
+variable "bitbucket_role" {
   type    = bool
-  default = true
+  default = false
+}
+
+variable "bitbucket_idp" {
+  type    = bool
+  default = false
 }
 
 variable "bitbucket_workspace" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "bitbucket_workspaceid" {
-  type = string
+  type    = string
+  default = null
 }
-

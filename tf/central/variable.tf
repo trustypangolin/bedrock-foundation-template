@@ -1,23 +1,17 @@
-variable "unique_prefix" {
-  type        = string
-  description = "customer name as a prefix used to be part of resource name."
-}
-
-variable "base_region" {
-  type        = string
-  description = "AWS region to operate in. Defaults to ap-southeast-2 (Sydney)."
-  default     = "ap-southeast-2"
-}
-
-variable "acc_map" {
-  description = "Account Name Mappings where the Account Name differs from the recommeneded names"
-  type        = map(string)
+variable "state" {
+  type = object(
+    {
+      bucket         = string
+      dynamodb_table = string
+      key            = string
+      region         = string
+    }
+  )
   default = {
-    "Management"  = "Management"
-    "Security"    = "Security"
-    "Central"     = "Central"
-    "Production"  = "Production"
-    "Development" = "Development"
+    bucket         = "bedrock-tfstate"
+    dynamodb_table = "bedrock-tfstate"
+    key            = "bedrock/org"
+    region         = "ap-southeast-2"
   }
 }
 
@@ -46,4 +40,9 @@ variable "enable_ec2_vpn" {
   description = "If set to true, enable the creation of EC2 VPN"
   type        = bool
   default     = false
+}
+
+variable "number_of_ngws" {
+  type    = number
+  default = 0
 }

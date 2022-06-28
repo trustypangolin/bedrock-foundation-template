@@ -1,0 +1,269 @@
+---
+#====================================================================================================
+# Description : Create the OIDC IdP and Role in the Target Account for CI/CD and Bedrock Source Access
+# Author      : Benjamin Luton
+# Date        : 2022-06-23
+# Version     : 1.0.0
+# Command Line:
+# aws cloudformation \
+#                    deploy \
+#                    --stack-name oidc-bedrock-bootstrap \
+#                    --template-file ./cloudformation/oidc.yml \
+#                    --capabilities CAPABILITY_NAMED_IAM \
+#                    --tags Owner="Benjamin Luton" Environment=S0
+#====================================================================================================
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "AWS IAM Role - CICD AWS Access"
+
+#====================================================================================================
+#                                             PARAMETERS
+#====================================================================================================
+Parameters:
+  # Source Builder Account
+  SourceAccount:
+    Type: Number
+    Default: 111111111111
+    Description: Source AWS Builder Account
+
+  GitlabOrg:
+    Type: String
+    Default: yourorg
+    Description: "The GitLab Organisation or User Name"
+  RepoName:
+    Type: String
+    Default: yourproject/yourrepo
+    Description: "The Project/Repo Name"
+  GitLabRoleEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the GitLab Role
+    AllowedValues: [true, false]
+  GitLabIdPEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the GitLab OIDC
+    AllowedValues: [true, false]
+
+  BitbucketWorkspace:
+    Type: String
+    Default: yourworkspace
+    Description: "The Bitbucket Workspace Name"
+  BitbucketOIDCAudience:
+    Type: String
+    Default: "the-repo-guid-here-without-curly-braces"
+    Description: Repo specific Audience value, eg the Workspace UUID
+  BitbucketRoleEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the Bitbucket Role
+    AllowedValues: [true, false]
+  BitbucketLimitClaim:
+    Type: String
+    Default: false
+    Description: Enable aud Claim filter to restrict OIDC to just this Repo, and not the Entire Workspace
+    # YOU WILL NEED TO MODIFY THIS TEMPLETE DIRECTLY FOR THIS OPTION
+    # CloudFormation doesnt allow a !Sub on a Key, replace ######yourworkspace###### directly around line 217
+    # Or get a Build Process to sed it directly before applying to the AWS Account
+    AllowedValues: [true, false]
+  BitbucketIdPEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the Bitbucket OIDC
+    AllowedValues: [true, false]
+
+  GitHubOrg:
+    Type: String
+    Default: yourorg
+  GitHubRepoName:
+    Type: String
+    Default: yourrepo
+  GitHubRoleEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the GitHub Role
+    AllowedValues: [true, false]
+  GitHubIdPEnable:
+    Type: String
+    Default: false
+    Description: Bootstrap the GitHub OIDC
+    AllowedValues: [true, false]
+
+#====================================================================================================
+#                                             METADATA
+#====================================================================================================
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Source AWS Details
+        Parameters:
+          - SourceAccount
+      - Label:
+          default: GitLab OIDC
+        Parameters:
+          - GitlabOrg
+          - RepoName
+          - GitLabRoleEnable
+          - GitLabIdPEnable
+      - Label:
+          default: Bitbucket OIDC
+        Parameters:
+          - BitbucketWorkspace
+          - BitbucketOIDCAudience
+          - BitbucketRoleEnable
+          - BitbucketIdPEnable
+          - BitbucketLimitClaim
+      - Label:
+          default: GitHub OIDC
+        Parameters:
+          - GitHubOrg
+          - GitHubRepoName
+          - GitHubRoleEnable
+          - GitHubIdPEnable
+#====================================================================================================
+#                                             Conditions
+#====================================================================================================
+Conditions:
+  # Create Roles
+  IsGitLabRoleEnabled: !Equals [!Ref GitLabRoleEnable, true]
+  IsBitbucketRoleEnabled: !Equals [!Ref BitbucketRoleEnable, true]
+  IsGitHubRoleEnabled: !Equals [!Ref GitHubRoleEnable, true]
+
+  # Create IdP
+  IsGitLabIdPEnabled: !Equals [!Ref GitLabIdPEnable, true]
+  IsBitbucketIdPEnabled: !Equals [!Ref BitbucketIdPEnable, true]
+  IsGitHubIdPEnabled: !Equals [!Ref GitHubIdPEnable, true]
+
+  # Bitbucket Special Purpose Claim
+  IsBitbucketClaim: !Equals [!Ref BitbucketLimitClaim, true]
+#====================================================================================================
+#                                             Resources
+#====================================================================================================
+Resources:
+  #====================================================================================================
+  #                                             GitLab OIDC
+  #====================================================================================================
+  GitLabOIDC:
+    Condition: IsGitLabIdPEnabled
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://gitlab.com
+      ThumbprintList:
+        - d89e3bd43d5d909b47a18977aa9d5ce36cee184c
+      ClientIdList:
+        - https://gitlab.com
+
+  #====================================================================================================
+  #                                             Bitbucket OIDC
+  #====================================================================================================
+  BitbucketOIDC:
+    Condition: IsBitbucketIdPEnabled
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: !Sub "https://api.Bitbucket.org/2.0/workspaces/${BitbucketWorkspace}/pipelines-config/identity/oidc"
+      ThumbprintList:
+        - a031c46782e6e6c662c2c87c76da9aa62ccabd8e
+      ClientIdList:
+        - !Sub "ari:cloud:Bitbucket::workspace/${BitbucketOIDCAudience}"
+
+  #====================================================================================================
+  #                                             GitHub OIDC
+  #====================================================================================================
+  GitHubOIDC:
+    Condition: IsGitHubIdPEnabled
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.GitHubusercontent.com
+      ThumbprintList:
+        - 6938fd4d98bab03faadb97b34396831e3780aea1
+      ClientIdList:
+        - sts.amazonaws.com
+
+  BedrockBootstrapRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bedrock-cloudformation-oidc
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # Allow GitHub to Assume this role via OIDC
+          - !If
+            - IsGitHubRoleEnabled
+            - Sid: "AllowGitHub"
+              Effect: Allow
+              Action: sts:AssumeRoleWithWebIdentity
+              Principal: !If
+                - IsGitHubIdPEnabled
+                - Federated: !Ref GitHubOIDC
+                - Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+              Condition:
+                StringLike:
+                  token.actions.GitHubusercontent.com:sub: !Sub repo:${GitHubOrg}/${GitHubRepoName}:*
+            - !Ref "AWS::NoValue"
+
+          # Allow GitLab to Assume this role via OIDC
+          - !If
+            - IsGitLabRoleEnabled
+            - Sid: "AllowGitLab"
+              Effect: Allow
+              Action: sts:AssumeRoleWithWebIdentity
+              Principal: !If
+                - IsGitLabIdPEnabled
+                - Federated: !Ref GitLabOIDC
+                - Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/gitlab.com"
+              Condition:
+                StringLike:
+                  gitlab.com:sub: !Sub project_path:${GitlabOrg}/${RepoName}:*
+            - !Ref "AWS::NoValue"
+
+          # Allow Bitbucket to Assume this role via OIDC
+          - !If
+            - IsBitbucketRoleEnabled
+            - Sid: "AllowBitbucket"
+              Effect: Allow
+              Action: sts:AssumeRoleWithWebIdentity
+              Principal: !If
+                - IsBitbucketIdPEnabled
+                - Federated: !Ref BitbucketOIDC
+                - Federated: !Sub "arn:aws:iam::${AWS::AccountId}:oidc-provider/api.Bitbucket.org/2.0/workspaces/${BitbucketOIDCAudience}/pipelines-config/identity/oidc"
+              Condition: !If
+                - IsBitbucketClaim
+                - StringLike:
+                    # MODIFY THIS BLOCK FOR BITBUCKET ###########
+                    api.Bitbucket.org/2.0/workspaces/######yourworkspace######/pipelines-config/identity/oidc:aud: !Sub "ari:cloud:Bitbucket::workspace/${BitbucketOIDCAudience}"
+                    # MODIFY THIS BLOCK FOR BITBUCKET ###########
+                - !Ref "AWS::NoValue"
+            - !Ref "AWS::NoValue"
+
+          # Allow BedrockAdmin to Assume this role STS
+          - Sid: "AllowSourceAdmin"
+            Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: !Sub "arn:aws:iam::${SourceAccount}:role/BedrockAdmin"
+      Policies:
+        - PolicyName: "allowassume"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: AssumeAccount
+                Effect: Allow
+                Action: ["sts:AssumeRole"]
+                Resource: "arn:aws:iam::*:role/bedrock-deploy"
+
+  BedrockDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: bedrock-deploy
+      MaxSessionDuration: 3600
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: "AllowDeploymentAdmin"
+            Effect: Allow
+            Action: sts:AssumeRole
+            Principal:
+              AWS: !GetAtt BedrockBootstrapRole.Arn
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess

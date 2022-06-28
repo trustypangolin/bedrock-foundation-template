@@ -1,4 +1,4 @@
-// DynamoDB Terraform state resources
+# DynamoDB Terraform state resources
 resource "aws_dynamodb_table" "terraform" {
   name         = "bedrock-tfstate"
   billing_mode = "PAY_PER_REQUEST"

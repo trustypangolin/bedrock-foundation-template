@@ -11,12 +11,21 @@ variable "unique_prefix" {
 
 variable "acc_map" {
   description = "Account Name Mappings where the Account Name differs from the recommeneded names"
-  type        = map(string)
+  type = object(
+    {
+      Management  = string
+      Security    = string
+      Central     = string
+      Development = string
+      Production  = string
+    }
+  )
   default = {
-    "Management"  = "Management"
-    "Security"    = "Security"
-    "Central"     = "Central"
-    "Development" = "Development"
+    Management  = "Management"
+    Security    = "Security"
+    Central     = "Central"
+    Development = "Development"
+    Production  = "Production"
   }
 }
 

@@ -7,6 +7,18 @@ output "acc" {
   })
 }
 
+output "acc_map" {
+  value = var.acc_map
+}
+
+output "base_region" {
+  value = data.aws_region.current.name
+}
+
+output "unique_prefix" {
+  value = var.unique_prefix
+}
+
 # These are used mostly for the Management folder for SERVICE_CONTROL_POLICY,BACKUP_POLICY
 output "security" {
   value = data.aws_organizations_organizational_units.org.children[0]
@@ -25,7 +37,7 @@ output "org_root" {
 }
 
 output "ops_accounts" {
-  value = [for account in data.aws_organizations_organization.org.non_master_accounts : account.id if account.name != "Audit" && account.name != "Log Archive"]
+  value = [for account in data.aws_organizations_organization.org.non_master_accounts : account.id if account.name != "Audit" && account.name != "Log Archive" && account.name != "Security"]
 }
 
 output "all_accounts_ids" {

@@ -3,21 +3,21 @@ resource "aws_organizations_policy_attachment" "denyrootkeys" {
   target_id = data.aws_organizations_organization.org.roots[0].id
 }
 
-// resource "aws_organizations_policy_attachment" "stopchanges" {
-//   policy_id = aws_organizations_policy.stop_changes.id
-//   target_id = data.terraform_remote_state.org.outputs.org_root.id
-// }
+# resource "aws_organizations_policy_attachment" "stopchanges" {
+#   policy_id = aws_organizations_policy.stop_changes.id
+#   target_id = data.terraform_remote_state.org.outputs.org_root.id
+# }
 
 # resource "aws_organizations_policy_attachment" "denys3del" {
 #   policy_id = aws_organizations_policy.deny_del_s3.id
 #   target_id = data.terraform_remote_state.org.outputs.security.id
 # }
 
-// Optional SCP attachment - This limits regions, but shows how it can be done. SCP is still created, but not attached
-// resource "aws_organizations_policy_attachment" "limitregion" {
-//   policy_id = aws_organizations_policy.limit_region.id
-//   target_id = data.terraform_remote_state.org.outputs.<a dev ou export>.id
-// }
+# Optional SCP attachment - This limits regions, but shows how it can be done. SCP is still created, but not attached
+# resource "aws_organizations_policy_attachment" "limitregion" {
+#   policy_id = aws_organizations_policy.limit_region.id
+#   target_id = data.terraform_remote_state.org.outputs.<a dev ou export>.id
+# }
 
 resource "aws_organizations_policy" "deny_del_s3" {
   name        = "Lock_Down_Audit_S3_Deletes"

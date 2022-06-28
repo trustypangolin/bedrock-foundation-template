@@ -6,17 +6,19 @@
 */
 
 module "modules_all_global" {
-  source     = "../modules/all_global/"
-  security   = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
-  central    = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
-  grafana_id = var.grafana_id
+  source        = "../modules/all_global/"
+  unique_prefix = local.unique_prefix
+  alias_name    = "central"
+  security      = local.security
+  central       = local.security
+  grafana_id    = var.grafana_id
 }
 
 module "modules_all_regional" {
   source        = "../modules/all_regional/"
-  unique_prefix = var.unique_prefix
-  base_region   = var.base_region
-  security      = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")]
+  unique_prefix = local.unique_prefix
+  base_region   = local.base_region
+  security      = local.security
   recorder      = true
   providers = {
     aws.ap-northeast-1 = aws.ap-northeast-1
