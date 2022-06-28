@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "cur" {
-  bucket = format("%s-cur", var.unique_prefix)
+  bucket = format("%s-cur", local.unique_prefix)
   #checkov:skip=CKV_AWS_145:No Cross Account
   #checkov:skip=CKV_AWS_144:No Cross Region
   #checkov:skip=CKV_AWS_21:Versioning not required
@@ -112,7 +112,7 @@ resource "aws_cur_report_definition" "cur_report_definition" {
   compression                = "Parquet"
   additional_schema_elements = ["RESOURCES"]
   s3_bucket                  = aws_s3_bucket.cur.id
-  s3_region                  = var.base_region
+  s3_region                  = local.base_region
 }
 
 resource "aws_s3_bucket_public_access_block" "cur" {
