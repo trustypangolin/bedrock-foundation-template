@@ -6,7 +6,7 @@
 */
 
 module "modules_all_global" {
-  source        = "../modules/all_global/"
+  source        = "../modules/global/foundation_baseline"
   unique_prefix = local.unique_prefix
   alias_name    = "central"
   security      = local.security
@@ -15,11 +15,11 @@ module "modules_all_global" {
 }
 
 module "modules_all_regional" {
-  source        = "../modules/all_regional/"
+  source        = "../modules/regional/foundation_baseline"
   unique_prefix = local.unique_prefix
   base_region   = local.base_region
   security      = local.security
-  recorder      = true
+  recorder      = false
   providers = {
     aws.ap-northeast-1 = aws.ap-northeast-1
     aws.ap-northeast-2 = aws.ap-northeast-2

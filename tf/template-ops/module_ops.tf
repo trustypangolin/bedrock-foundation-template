@@ -6,11 +6,17 @@
 */
 
 module "modules_ops_global" {
-  source = "../modules/ops_global/"
-  # unique_prefix = var.unique_prefix
+  source  = "../modules/global/foundation_baseline_ops"
+  central = local.security
 }
 
 module "modules_ops_regional" {
-  source = "../modules/ops_regional/"
-  # unique_prefix = var.unique_prefix
+  source = "../modules/regional/foundation_baseline_ops"
+}
+
+module "modules_vpc" {
+  source              = "../modules/regional/network/"
+  network_prefix      = var.vpccidr
+  env                 = var.env
+  flow_log_bucket_arn = format("arn:aws:s3:::%s-flow-logs", local.unique_prefix)
 }

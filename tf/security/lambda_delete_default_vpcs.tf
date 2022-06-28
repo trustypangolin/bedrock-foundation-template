@@ -43,7 +43,7 @@ resource "aws_lambda_function" "delete_default_vpcs_function" {
   filename      = "./python/delete-default-vpc.zip"
   environment {
     variables = {
-      "ORGLIST" = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Management")]
+      "ORGLIST" = local.management
       "ROLE"    = var.crossrole
     }
   }

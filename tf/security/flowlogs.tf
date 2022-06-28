@@ -1,7 +1,7 @@
 data "aws_canonical_user_id" "current" {}
 
 resource "aws_s3_bucket" "flow_logs" {
-  bucket = format("%s-flow-logs", var.unique_prefix)
+  bucket = format("%s-flow-logs", local.unique_prefix)
 }
 
 resource "aws_s3_bucket_acl" "flow_logs" {
@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "flow_logs" {
   statement {
     sid       = "ForceSSLOnlyAccess"
     effect    = "Deny"
-    resources = [format("arn:aws:s3:::%s-flow-logs/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-flow-logs/*", local.unique_prefix)]
     actions   = ["s3:*"]
     condition {
       test     = "Bool"
@@ -91,7 +91,7 @@ data "aws_iam_policy_document" "flow_logs" {
   statement {
     sid       = "AWSLogDeliveryWrite"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-flow-logs/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-flow-logs/*", local.unique_prefix)]
     actions   = ["s3:PutObject"]
     principals {
       type        = "Service"
@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "flow_logs" {
   statement {
     sid       = "AWSLogDeliveryCheck"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-flow-logs", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-flow-logs", local.unique_prefix)]
     actions   = ["s3:GetBucketAcl", "s3:ListBucket"]
     principals {
       type        = "Service"
@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "flow_logs" {
   statement {
     sid       = "AllowCloudFront"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-flow-logs", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-flow-logs", local.unique_prefix)]
     actions   = ["s3:GetBucketAcl", "s3:PutBucketAcl"]
     condition {
       test     = "StringEquals"

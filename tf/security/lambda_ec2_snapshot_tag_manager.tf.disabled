@@ -49,7 +49,7 @@ resource "aws_lambda_function" "worker_snapshot_parent_manager_function" {
   dead_letter_config {
     target_arn = join(":", [
       "arn:aws:sns",
-      var.base_region,
+      local.base_region,
       lookup(data.terraform_remote_state.org.outputs.acc, "Audit"),
       "bedrock-audit-deadletter"
     ])
@@ -82,7 +82,7 @@ resource "aws_lambda_function" "snapshot_parent_manager_function" {
   dead_letter_config {
     target_arn = join(":", [
       "arn:aws:sns",
-      var.base_region,
+      local.base_region,
       lookup(data.terraform_remote_state.org.outputs.acc, "Audit"),
       "bedrock-audit-deadletter"
     ])

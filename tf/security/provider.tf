@@ -24,9 +24,9 @@ locals {
   central = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Central")
   ]
-  development = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
-  ]
+  # development = data.terraform_remote_state.org.outputs.acc[
+  #   lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
+  # ]
   production = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Production")
   ]
@@ -39,9 +39,9 @@ data "aws_regions" "current" {}
 data "aws_caller_identity" "current" {}
 
 provider "aws" {
-  region = var.base_region
+  region = local.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Security")])
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", local.security)
     session_name = "terraform"
   }
   default_tags {
@@ -54,9 +54,9 @@ provider "aws" {
 
 provider "aws" {
   alias  = "management"
-  region = var.base_region
+  region = local.base_region
   assume_role {
-    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Management")])
+    role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", local.management)
     session_name = "terraform"
   }
   default_tags {

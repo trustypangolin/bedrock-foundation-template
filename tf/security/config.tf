@@ -11,7 +11,7 @@ resource "aws_organizations_delegated_administrator" "config-multi" {
 }
 
 resource "aws_s3_bucket" "config_delivery" {
-  bucket = format("%s-config-recordings", var.unique_prefix)
+  bucket = format("%s-config-recordings", local.unique_prefix)
 }
 
 resource "aws_s3_bucket_public_access_block" "config_delivery" {
@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "config_delivery" {
   statement {
     sid       = "AWSConfigBucketPermissionsCheck"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-config-recordings", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-config-recordings", local.unique_prefix)]
     actions   = ["s3:GetBucketAcl"]
     principals {
       type        = "Service"
@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "config_delivery" {
   statement {
     sid       = "AWSConfigBucketExistenceCheck"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-config-recordings", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-config-recordings", local.unique_prefix)]
     actions   = ["s3:ListBucket"]
     principals {
       type        = "Service"
@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "config_delivery" {
   statement {
     sid       = "AWSConfigBucketDelivery"
     effect    = "Allow"
-    resources = [format("arn:aws:s3:::%s-config-recordings/AWSLogs/*/Config/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-config-recordings/AWSLogs/*/Config/*", local.unique_prefix)]
     actions   = ["s3:PutObject"]
     condition {
       test     = "StringEquals"
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "config_delivery" {
   statement {
     sid       = "ForceSSLOnlyAccess"
     effect    = "Deny"
-    resources = [format("arn:aws:s3:::%s-config-recordings/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-config-recordings/*", local.unique_prefix)]
     actions   = ["s3:*"]
     condition {
       test     = "Bool"

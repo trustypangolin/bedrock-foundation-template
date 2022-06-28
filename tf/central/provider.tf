@@ -24,9 +24,9 @@ locals {
   central = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Central")
   ]
-  development = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
-  ]
+  # development = data.terraform_remote_state.org.outputs.acc[
+  #   lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
+  # ]
   production = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Production")
   ]

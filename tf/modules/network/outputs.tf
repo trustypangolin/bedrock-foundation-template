@@ -1,58 +1,23 @@
-## VPC Outputs
-output "vpc_id" {
-  value = aws_vpc.vpc.id
-}
-
-output "vpc_cidr" {
-  value = aws_vpc.vpc.cidr_block
-}
-
-## Subnet Outputs
-output "subnet_ids" {
-  value = concat(
-    aws_subnet.public_subnets.*.id,
-    aws_subnet.private_subnets.*.id,
-    aws_subnet.isolated_subnets.*.id
-  )
-}
-
-# Subnet Ids
-output "public_subnet_ids" {
-  value = aws_subnet.public_subnets.*.id
-}
-
-output "private_subnet_ids" {
-  value = aws_subnet.private_subnets.*.id
-}
-
-output "isolated_subnet_ids" {
-  value = aws_subnet.isolated_subnets.*.id
-}
-
-# Subnet CIDRs
-output "public_subnet_cidrs" {
-  value = aws_subnet.public_subnets.*.cidr_block
-}
-
-output "private_subnet_cidrs" {
-  value = aws_subnet.private_subnets.*.cidr_block
-}
-
-output "isolated_subnet_cidrs" {
-  value = aws_subnet.isolated_subnets.*.cidr_block
-}
-
-## Route Table outputs
-output "public_rt_ids" {
-  value = aws_route_table.public_route_tables.*.id
-}
-
-output "private_rt_ids" {
-  value = aws_route_table.private_route_tables.*.id
-}
-
-output "isolated_rt_ids" {
-  value = aws_route_table.isolated_route_tables.*.id
+output "vpc" {
+  value = {
+    "vpc_id" : aws_vpc.vpc.id,
+    "cidr" : aws_vpc.vpc.cidr_block,
+    "public" : {
+      "subnet_cidrs" : aws_subnet.public_subnets.*.cidr_block,
+      "subnet_ids" : aws_subnet.public_subnets.*.id,
+      "routetable_ids" : aws_route_table.public_route_tables.*.id
+    },
+    "private" : {
+      "subnet_cidrs" : aws_subnet.private_subnets.*.cidr_block,
+      "subnet_ids" : aws_subnet.private_subnets.*.id,
+      "routetable_ids" : aws_route_table.private_route_tables.*.id
+    },
+    "isolated" : {
+      "subnet_cidrs" : aws_subnet.isolated_subnets.*.cidr_block,
+      "subnet_ids" : aws_subnet.isolated_subnets.*.id,
+      "routetable_ids" : aws_route_table.isolated_route_tables.*.id
+    },
+  }
 }
 
 // #TWG

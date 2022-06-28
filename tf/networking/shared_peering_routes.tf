@@ -2,7 +2,7 @@ locals {
   vpc_peering_routes = [
     {
       env             = "prod"
-      peer_account_id = data.terraform_remote_state.org.outputs.acc[lookup(var.acc_map, "Production")]
+      peer_account_id = local.production
       peer_vpc_id     = data.terraform_remote_state.prod.outputs.vpc_id
       peer_region     = var.aws_primary_region
       cidr_block      = data.terraform_remote_state.prod.outputs.vpc_cidr

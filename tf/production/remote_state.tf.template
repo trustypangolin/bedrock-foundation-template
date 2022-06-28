@@ -3,3 +3,12 @@ terraform {
     dynamodb_table = "bedrock-tfstate"
   }
 }
+
+# terraform init                            \
+# -backend-config="bucket=indigocapybara-tfstate"   \
+# -backend-config="key=bedrock/production"  \
+# -backend-config="region=ap-southeast-2"        \
+# -reconfigure
+
+# SECRET for BEDROCK_TF_STATE 
+# awk 'NF && ! /#/' remote_state.tf | base64

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "public" {
-  bucket = format("%s-public", var.unique_prefix)
+  bucket = format("%s-public", local.unique_prefix)
 }
 
 resource "aws_s3_bucket_public_access_block" "public" {
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "public" {
   statement {
     sid       = "ForceSSLOnlyAccess"
     effect    = "Deny"
-    resources = [format("arn:aws:s3:::%s-public/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-public/*", local.unique_prefix)]
     actions   = ["s3:*"]
     condition {
       test     = "Bool"
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "public" {
   statement {
     sid       = "DenyUnEncryptedObjectUploads"
     effect    = "Deny"
-    resources = [format("arn:aws:s3:::%s-public/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-public/*", local.unique_prefix)]
     actions   = ["s3:PutObject"]
 
     condition {
@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "public" {
       identifiers = [aws_cloudfront_origin_access_identity.public.iam_arn]
     }
     actions   = ["s3:GetObject"]
-    resources = [format("arn:aws:s3:::%s-public/*", var.unique_prefix)]
+    resources = [format("arn:aws:s3:::%s-public/*", local.unique_prefix)]
   }
 }
 
@@ -97,7 +97,7 @@ resource "aws_cloudfront_distribution" "public" {
 
   # logging_config {
   #   include_cookies = false
-  #   bucket          = format("%s-flow-logs.s3.amazonaws.com", var.unique_prefix)
+  #   bucket          = format("%s-flow-logs.s3.amazonaws.com", local.unique_prefix)
   #   prefix          = "CloudFront"
   # }
 

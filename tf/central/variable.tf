@@ -8,7 +8,7 @@ variable "state" {
     }
   )
   default = {
-    bucket         = "bedrock-tfstate"
+    bucket         = "indigocapybara-tfstate"
     dynamodb_table = "bedrock-tfstate"
     key            = "bedrock/org"
     region         = "ap-southeast-2"

@@ -1,23 +1,18 @@
-variable "unique_prefix" {
-  type        = string
-  description = "customer name as a prefix used to be part of resource name."
-}
-
-variable "base_region" {
-  type        = string
-  description = "AWS region to operate in. Defaults to ap-southeast-2 (Sydney)."
-  default     = "ap-southeast-2"
-}
-
-variable "acc_map" {
-  description = "Account Name Mappings where the Account Name differs from the recommeneded names"
-  type        = map(string)
+variable "state" {
+  type = object(
+    {
+      bucket         = string
+      dynamodb_table = string
+      key            = string
+      region         = string
+    }
+  )
+  # Change this across all projects to match actual state config or set it in terraform.tfvars
   default = {
-    "Management"  = "Management"
-    "Security"    = "Security"
-    "Central"     = "Central"
-    "Production"  = "Production"
-    "Development" = "Development"
+    bucket         = "indigocapybara-tfstate"
+    dynamodb_table = "bedrock-tfstate"
+    key            = "bedrock/org"
+    region         = "ap-southeast-2"
   }
 }
 
