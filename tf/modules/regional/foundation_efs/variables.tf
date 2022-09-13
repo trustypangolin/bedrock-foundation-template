@@ -17,11 +17,11 @@ variable "instance_group" {
 variable "vpc" {
   type = object(
     {
-      vpc_id  = string,
-      cidr    = string,
-      public  = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
-      private = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
-      public  = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
+      vpc_id   = string,
+      cidr     = string,
+      public   = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
+      private  = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
+      isolated = object({ subnet_cidrs = list(string), subnet_ids = list(string), routetable_ids = list(string) }),
     }
   )
 }

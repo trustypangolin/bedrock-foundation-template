@@ -1,4 +1,5 @@
 resource "aws_config_configuration_recorder" "bedrock" {
+  count    = var.control_tower ? 0 : 1
   name     = "default"
   role_arn = format("arn:aws:iam::%s:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig", data.aws_caller_identity.current.account_id)
   recording_group {
@@ -8,17 +9,18 @@ resource "aws_config_configuration_recorder" "bedrock" {
 }
 
 resource "aws_config_delivery_channel" "bedrock" {
+  count          = var.control_tower ? 0 : 1
   name           = "default"
   s3_bucket_name = format("%s-config-recordings", var.unique_prefix)
   sns_topic_arn  = var.sns_topic == null ? null : format("arn:aws:sns:%s:%s:%s", data.aws_region.current.name, data.aws_caller_identity.current.account_id, var.sns_topic)
   snapshot_delivery_properties {
     delivery_frequency = "TwentyFour_Hours"
   }
-  depends_on = [aws_config_configuration_recorder.bedrock]
+  depends_on = [aws_config_configuration_recorder.bedrock[0]]
 }
 
 resource "aws_config_configuration_aggregator" "bedrock" {
-  count = var.security == data.aws_caller_identity.current.account_id ? 1 : 0
+  count = var.security == data.aws_caller_identity.current.account_id && var.control_tower == false ? 1 : 0
   name  = "default"
   organization_aggregation_source {
     all_regions = true
@@ -27,7 +29,7 @@ resource "aws_config_configuration_aggregator" "bedrock" {
 }
 
 resource "aws_iam_role" "config_org" {
-  count                = var.security == data.aws_caller_identity.current.account_id ? 1 : 0
+  count                = var.security == data.aws_caller_identity.current.account_id && var.control_tower == false ? 1 : 0
   name                 = "bedrock-config-aggregator-org"
   max_session_duration = 3600
   managed_policy_arns  = ["arn:aws:iam::aws:policy/service-role/AWSConfigRoleForOrganizations"]
@@ -35,7 +37,7 @@ resource "aws_iam_role" "config_org" {
 }
 
 data "aws_iam_policy_document" "config_org" {
-  count = var.security == data.aws_caller_identity.current.account_id ? 1 : 0
+  count = var.security == data.aws_caller_identity.current.account_id && var.control_tower == false ? 1 : 0
   statement {
     sid     = ""
     effect  = "Allow"
@@ -50,12 +52,14 @@ data "aws_iam_policy_document" "config_org" {
 
 
 resource "aws_config_aggregate_authorization" "base_region" {
+  count      = var.control_tower ? 0 : 1
   account_id = var.security
   region     = var.base_region
 }
 
 resource "aws_config_configuration_recorder_status" "bedrock" {
-  name       = aws_config_configuration_recorder.bedrock.name
+  count      = var.control_tower ? 0 : 1
+  name       = aws_config_configuration_recorder.bedrock[0].name
   is_enabled = var.recorder
-  depends_on = [aws_config_delivery_channel.bedrock]
+  depends_on = [aws_config_delivery_channel.bedrock[0]]
 }

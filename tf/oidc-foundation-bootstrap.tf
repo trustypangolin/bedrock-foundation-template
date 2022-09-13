@@ -4,7 +4,7 @@ data "tls_certificate" "gitlab" {
 }
 
 resource "aws_iam_openid_connect_provider" "gitlab" {
-  count           = var.gitlab_idp == true ? 1 : 0
+  count           = var.gitlab_idp ? 1 : 0
   url             = var.gitlab_url
   client_id_list  = [var.gitlab_aud]
   thumbprint_list = [data.tls_certificate.gitlab.certificates.0.sha1_fingerprint]
@@ -16,11 +16,11 @@ data "tls_certificate" "github" {
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
-  count          = var.github_idp == true ? 1 : 0
+  count          = var.github_idp ? 1 : 0
   url            = "https://token.actions.githubusercontent.com"
   client_id_list = ["sts.amazonaws.com"]
   thumbprint_list = [
-    data.tls_certificate.github.certificates.2.sha1_fingerprint,
+    data.tls_certificate.github.certificates.0.sha1_fingerprint,
     "6938fd4d98bab03faadb97b34396831e3780aea1"
   ]
 }
@@ -31,7 +31,7 @@ data "tls_certificate" "bitbucket" {
 }
 
 resource "aws_iam_openid_connect_provider" "bitbucket" {
-  count          = var.bitbucket_idp == true ? 1 : 0
+  count          = var.bitbucket_idp ? 1 : 0
   url            = format("https://api.bitbucket.org/2.0/workspaces/%s/pipelines-config/identity/oidc", var.bitbucket_workspace)
   client_id_list = [format("ari:cloud:bitbucket::workspace/%s", var.bitbucket_workspaceid)]
   thumbprint_list = [
@@ -39,22 +39,19 @@ resource "aws_iam_openid_connect_provider" "bitbucket" {
   ]
 }
 
-# Roles
-resource "aws_iam_role" "bedrock_oidc" {
-  name                 = "bedrock-terraform-oidc"
-  assume_role_policy   = data.aws_iam_policy_document.trust-oidc.json
+# OIDC Role
+resource "aws_iam_role" "foundation_oidc" {
+  name                 = format("%s-%s", var.bootstrap_prefix, var.oidc_role)
+  assume_role_policy   = data.aws_iam_policy_document.trust_oidc.json
   max_session_duration = 3600
   inline_policy {
     name   = "allowassume"
     policy = data.aws_iam_policy_document.allow_assume.json
   }
-  inline_policy {
-    name   = "TerraformState"
-    policy = data.aws_iam_policy_document.tf_state.json
-  }
 }
 
-data "aws_iam_policy_document" "trust-oidc" {
+data "aws_iam_policy_document" "trust_oidc" {
+  # Is the OIDC Source GitHub? If so, add the GitHub IdP as the trust source
   dynamic "statement" {
     for_each = var.github_role ? [1] : []
     content {
@@ -73,7 +70,7 @@ data "aws_iam_policy_document" "trust-oidc" {
     }
   }
 
-
+  # Is the OIDC Source GitLab? If so, add the GitLab IdP as the trust source
   dynamic "statement" {
     for_each = var.gitlab_role ? [1] : []
     content {
@@ -92,7 +89,7 @@ data "aws_iam_policy_document" "trust-oidc" {
     }
   }
 
-
+  # Is the OIDC Source Bitbucket? If so, add the Bitbucket IdP as the trust source
   dynamic "statement" {
     for_each = var.bitbucket_role ? [1] : []
     content {
@@ -109,21 +106,6 @@ data "aws_iam_policy_document" "trust-oidc" {
       }
     }
   }
-
-  # Allow BedrockAdmin to Assume this role STS
-  dynamic "statement" {
-    for_each = var.source_account != null ? [1] : []
-    content {
-      sid = "AllowBedrockAdmin"
-      actions = [
-        "sts:AssumeRole"
-      ]
-      principals {
-        type        = "AWS"
-        identifiers = [format("arn:aws:iam::%s:role/BedrockAdmin", var.source_account)]
-      }
-    }
-  }
 }
 
 data "aws_iam_policy_document" "allow_assume" {
@@ -132,16 +114,39 @@ data "aws_iam_policy_document" "allow_assume" {
       "sts:AssumeRole"
     ]
     resources = [
-      "arn:aws:iam::*:role/bedrock-deploy",
+      format("arn:aws:iam::*:role/%s-tf-state", var.bootstrap_prefix),
     ]
   }
 }
 
-resource "aws_iam_role" "bedrock_deploy" {
-  name                 = "bedrock-deploy"
+resource "aws_iam_role" "tf_state" {
+  name                 = format("%s-tf-state", var.bootstrap_prefix)
   assume_role_policy   = data.aws_iam_policy_document.role_trust.json
-  max_session_duration = 43200
-  managed_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  max_session_duration = 3600
+  inline_policy {
+    name   = "TerraformStateS3"
+    policy = data.aws_iam_policy_document.tf_state_s3.json
+  }
+
+  inline_policy {
+    name   = "TerraformStateDynamoDB"
+    policy = data.aws_iam_policy_document.tf_state_dynamodb.json
+  }
+
+  inline_policy {
+    name   = "TerraformStateOrg"
+    policy = data.aws_iam_policy_document.tf_state_org.json
+  }
+
+  inline_policy {
+    name   = "TerraformStateSSO"
+    policy = data.aws_iam_policy_document.tf_state_sso.json
+  }
+
+  inline_policy {
+    name   = "AssumeDeploy"
+    policy = data.aws_iam_policy_document.assume_deploy.json
+  }
 }
 
 data "aws_iam_policy_document" "role_trust" {
@@ -152,15 +157,30 @@ data "aws_iam_policy_document" "role_trust" {
     ]
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.bedrock_oidc.arn]
+      identifiers = [aws_iam_role.foundation_oidc.arn]
+    }
+  }
+
+  # Allow Contino to Assume this role STS for Debug
+  dynamic "statement" {
+    for_each = var.source_account != null ? [1] : []
+    content {
+      sid = "ThisIsARestrictedContinoAWSAccount"
+      actions = [
+        "sts:AssumeRole"
+      ]
+      principals {
+        type        = "AWS"
+        identifiers = [format("arn:aws:iam::%s:root", var.source_account)]
+      }
     }
   }
 }
 
-# OIDC entry Role requires access to TF State for basic functionality in addition to the ability to assume the deployment roles
+# TF State Role requires access to TF State for basic functionality in addition to the ability to assume the deployment roles
 # This ensures that if the aws provider isnt configured for roles correctly, that no resources can be created in the wrong account
 # Additional Policy Documents and Roles can be created for restricted access to developers, this is generally done via SSO Permission Sets
-data "aws_iam_policy_document" "tf_state" {
+data "aws_iam_policy_document" "tf_state_s3" {
   statement {
     sid       = "AccessListS3"
     effect    = "Allow"
@@ -182,13 +202,11 @@ data "aws_iam_policy_document" "tf_state" {
   statement {
     sid    = "AccessS3"
     effect = "Allow"
-
     resources = [
-      format("%s/bedrock/*", aws_s3_bucket.tfstate.arn),     # Allow access to bedrock state objects
-      format("%s/application/*", aws_s3_bucket.tfstate.arn), # For an application stack using workspaces
-      format("%s/fullstack", aws_s3_bucket.tfstate.arn),     # for an application default workspace
+      format("%s/%s/*", aws_s3_bucket.tfstate.arn, var.bootstrap_prefix), # Allow access to foundation state objects
+      format("%s/application/*", aws_s3_bucket.tfstate.arn),              # For an application stack using workspaces
+      format("%s/fullstack", aws_s3_bucket.tfstate.arn),                  # for an application default workspace
     ]
-
     actions = [
       "s3:PutObject",
       "s3:GetObject",
@@ -196,7 +214,9 @@ data "aws_iam_policy_document" "tf_state" {
       "s3:DeleteObject",
     ]
   }
+}
 
+data "aws_iam_policy_document" "tf_state_dynamodb" {
   statement {
     sid       = "AccessDynamoDB"
     effect    = "Allow"
@@ -206,13 +226,63 @@ data "aws_iam_policy_document" "tf_state" {
       "dynamodb:PutItem",
       "dynamodb:GetItem",
       "dynamodb:DeleteItem",
+      "dynamodb:DescribeTable",
     ]
   }
 
   statement {
-    sid       = "AssumeAll"
+    sid    = "AccessDynamoDBTableList"
+    effect = "Allow"
+    resources = [
+      "arn:aws:dynamodb:*:*:table/*"
+    ]
+    actions = [
+      "dynamodb:ListTables",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "tf_state_org" {
+  statement {
+    sid       = "AccessOrgValues"
     effect    = "Allow"
-    resources = ["arn:aws:iam::*:role/bedrock-deploy"]
-    actions   = ["sts:AssumeRole"]
+    resources = ["*"]
+    actions = [
+      "backup:DescribeGlobalSettings",
+      "backup:UpdateGlobalSettings",
+      "organizations:CreatePolicy",
+      "organizations:Describe*",
+      "organizations:Enable*",
+      "organizations:List*",
+      "organizations:TagResource",
+      "organizations:UntagResource",
+      "organizations:UpdatePolicy",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "tf_state_sso" {
+  statement {
+    sid       = "AccessOrgValues"
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "sso:*",
+    ]
+  }
+}
+
+# Deployment Role will be Different for Control Tower
+data "aws_iam_policy_document" "assume_deploy" {
+  # These are the Roles that Terraform will use to deploy actual resources in most projects
+  statement {
+    sid    = "AssumeAll"
+    effect = "Allow"
+    resources = [
+      "arn:aws:iam::*:role/AWSControlTowerExecution",
+      "arn:aws:iam::*:role/OrganizationAccountAccessRole",
+      format("arn:aws:iam::*:role/%s-deploy", var.bootstrap_prefix)
+    ]
+    actions = ["sts:AssumeRole"]
   }
 }

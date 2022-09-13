@@ -1,12 +1,25 @@
 variable "base_region" {
   type        = string
   description = "AWS region to operate in. Defaults to ap-southeast-2 (Sydney)."
-  default     = "ap-southeast-2"
+  default     = null
 }
 
 variable "unique_prefix" {
   type        = string
   description = "prefix used to be part of resource name"
+  default     = null
+}
+
+variable "root_emails" {
+  description = "root email address for new accounts"
+  type        = map(string)
+  default     = null
+}
+
+variable "notifications" {
+  description = "notification email address for new accounts"
+  type        = map(string)
+  default     = null
 }
 
 variable "acc_map" {
@@ -14,6 +27,7 @@ variable "acc_map" {
   type = object(
     {
       Management  = string
+      LogArchive  = string
       Security    = string
       Central     = string
       Development = string
@@ -22,6 +36,7 @@ variable "acc_map" {
   )
   default = {
     Management  = "Management"
+    LogArchive  = "Log Archive"
     Security    = "Security"
     Central     = "Central"
     Development = "Development"
@@ -37,10 +52,24 @@ variable "tags" {
   }
 }
 
+variable "alt_contacts" {
+  description = "Alternate Contacts"
+  type        = string
+  default     = <<-CSV
+  Function,Name,Title,Email,Phone
+  finance,Finance Person,CFO,finance@domain.abc,1300 000 000
+  BILLING,IT Billing Person,Manager,aws.billing@domain.abc,1300 000 000
+  OPERATIONS,IT Ops Person,Ops,aws.operations@domain.abc,0400 000 000
+  SECURITY,IT Security Person,Sec,aws.security@domain.abc,0400 000 000
+CSV
+}
+
 # Org Variables
-variable "root_emails" {
-  description = "root email address for new accounts"
-  type        = map(string)
+
+variable "base_role" {
+  type        = string
+  description = "Sub Account Role to create/assume."
+  default     = null
 }
 
 variable "backup_regions" {
@@ -75,4 +104,23 @@ variable "backup_crons" {
     r3monthly = "cron(0 15 ? * 1#1 *)"
     r3yearly  = "cron(0 4 1 1 ? *)"
   }
+}
+
+variable "grafana_id" {
+  type        = string
+  description = "This is your Grafana Cloud identifier and is used for security purposes."
+  default     = null
+}
+
+variable "control_tower" {
+  type        = bool
+  description = "Is this a Control Tower setup? Some resources will not be installed"
+  default     = false
+}
+
+# Customise Entry Roles
+variable "bootstrap_prefix" {
+  type        = string
+  description = "To match customer naming polices, we create a Landing Zone prefix for state, role, dynamodb resources. Typically foundation,bedrock,landingzone etc"
+  default     = "bedrock"
 }

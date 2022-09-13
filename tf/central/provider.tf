@@ -15,31 +15,23 @@ data "terraform_remote_state" "org" {
 }
 
 locals {
-  management = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Management")
-  ]
   security = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Security")
   ]
   central = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Central")
   ]
-  # development = data.terraform_remote_state.org.outputs.acc[
-  #   lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
-  # ]
-  production = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Production")
-  ]
-
   unique_prefix = data.terraform_remote_state.org.outputs.unique_prefix
   base_region   = data.terraform_remote_state.org.outputs.base_region
+  grafana_id    = data.terraform_remote_state.org.outputs.grafana_id
+  environment   = "central"
 }
 
 data "aws_regions" "current" {}
 data "aws_caller_identity" "current" {}
 
 provider "aws" {
-  region = local.base_region
+  region = local.region
   assume_role {
     role_arn     = format("arn:aws:iam::%s:role/bedrock-terraform", local.central)
     session_name = "terraform"

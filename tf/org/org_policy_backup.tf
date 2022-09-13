@@ -1,14 +1,17 @@
 resource "aws_organizations_policy_attachment" "r1" {
+  count     = local.workspace["control_tower"] ? 0 : 1
   policy_id = aws_organizations_policy.r1.id
   target_id = data.aws_organizations_organizational_units.org.children[1].id
 }
 
 resource "aws_organizations_policy_attachment" "r2" {
+  count     = local.workspace["control_tower"] ? 0 : 1
   policy_id = aws_organizations_policy.r2.id
   target_id = data.aws_organizations_organizational_units.org.children[1].id
 }
 
 resource "aws_organizations_policy_attachment" "r3" {
+  count     = local.workspace["control_tower"] ? 0 : 1
   policy_id = aws_organizations_policy.r3.id
   target_id = data.aws_organizations_organizational_units.org.children[1].id
 }
@@ -379,7 +382,7 @@ resource "aws_organizations_policy" "r3" {
 CONTENT
 }
 
-resource "aws_backup_global_settings" "test" {
+resource "aws_backup_global_settings" "cross_account" {
   global_settings = {
     "isCrossAccountBackupEnabled" = "true"
   }

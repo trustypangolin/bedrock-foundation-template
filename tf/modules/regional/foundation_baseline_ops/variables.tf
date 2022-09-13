@@ -16,10 +16,3 @@ variable "schedulenonprod" {
   default     = "cron(0 4 ? * SUN *)"
 }
 
-# variable "tags" {
-#   description = "Tags to set on resources"
-#   type        = map(string)
-#   default = {
-#     IaC = "Terraform"
-#   }
-# }

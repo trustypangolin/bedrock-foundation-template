@@ -4,32 +4,21 @@ locals {
 }
 
 resource "aws_iam_role" "grafana_labs_cloudwatch_integration" {
+  count              = var.grafana_id == null ? 0 : 1
   name               = var.grafana_role_name
   description        = "Role used by Grafana CloudWatch Integration."
-  assume_role_policy = data.aws_iam_policy_document.trust_grafana.json
+  assume_role_policy = data.aws_iam_policy_document.trust_grafana[0].json
 
   # This policy allows the role to discover metrics via tags and export them.
   inline_policy {
-    name = var.grafana_role_name
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Effect = "Allow"
-          Action = [
-            "tag:GetResources",
-            "cloudwatch:GetMetricData",
-            "cloudwatch:GetMetricStatistics",
-            "cloudwatch:ListMetrics"
-          ]
-          Resource = "*"
-        }
-      ]
-    })
+    name   = var.grafana_role_name
+    policy = data.aws_iam_policy_document.grafana[0].json
   }
 }
 
+
 data "aws_iam_policy_document" "trust_grafana" {
+  count = var.grafana_id == null ? 0 : 1
   statement {
     effect = "Allow"
 
@@ -47,7 +36,22 @@ data "aws_iam_policy_document" "trust_grafana" {
   }
 }
 
+data "aws_iam_policy_document" "grafana" {
+  count = var.grafana_id == null ? 0 : 1
+  statement {
+    effect = "Allow"
+    actions = [
+      "tag:GetResources",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics",
+      "cloudwatch:ListMetrics"
+    ]
+    resources = ["*"]
+  }
+}
+
+
 output "role_arn" {
-  value       = aws_iam_role.grafana_labs_cloudwatch_integration.arn
+  value       = length(var.grafana_id) > 0 ? aws_iam_role.grafana_labs_cloudwatch_integration[0].arn : null
   description = "The ARN for the role created, copy this into Grafana Cloud installation."
 }

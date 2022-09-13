@@ -10,7 +10,9 @@ locals {
 
 # terraform import aws_organizations_organization.org r-abcde
 resource "aws_organizations_organization" "org" {
-  aws_service_access_principals = [
+  aws_service_access_principals = sort(compact([
+    local.workspace["control_tower"] ? "controltower.amazonaws.com" : null,             # Only Enable if it's already active
+    local.workspace["control_tower"] ? null : "config-multiaccountsetup.amazonaws.com", # Only Enable if Control Tower isn't active
     "access-analyzer.amazonaws.com",
     "account.amazonaws.com",
     "auditmanager.amazonaws.com",
@@ -18,7 +20,6 @@ resource "aws_organizations_organization" "org" {
     "backup.amazonaws.com",
     "cloudtrail.amazonaws.com",
     "compute-optimizer.amazonaws.com",
-    "config-multiaccountsetup.amazonaws.com",
     "config.amazonaws.com",
     "fms.amazonaws.com",
     "guardduty.amazonaws.com",
@@ -38,7 +39,7 @@ resource "aws_organizations_organization" "org" {
     "sso.amazonaws.com",
     "storage-lens.s3.amazonaws.com",
     "tagpolicies.tag.amazonaws.com",
-  ]
+  ]))
   enabled_policy_types = [
     "SERVICE_CONTROL_POLICY",
     "BACKUP_POLICY",
@@ -57,6 +58,7 @@ data "aws_organizations_organizational_units" "org" {
 
 # terraform import aws_organizations_organizational_unit.security ou-abcd-123efg456
 resource "aws_organizations_organizational_unit" "security" {
+  count     = local.workspace["control_tower"] ? 0 : 1
   name      = "Security"
   parent_id = aws_organizations_organization.org.roots[0].id
   tags      = var.tags
@@ -64,6 +66,7 @@ resource "aws_organizations_organizational_unit" "security" {
 
 # terraform import aws_organizations_organizational_unit.operational ou-abcd-234efg789
 resource "aws_organizations_organizational_unit" "operational" {
+  count     = local.workspace["control_tower"] ? 0 : 1
   name      = "Operational"
   parent_id = aws_organizations_organization.org.roots[0].id
   tags      = var.tags
@@ -72,15 +75,13 @@ resource "aws_organizations_organizational_unit" "operational" {
 # For precreated accounts, import the following resources first
 # terraform import 'aws_organizations_account.members["Development"]' 111222333444
 
-# For Control Tower, import the following resources first
-# terraform import 'aws_organizations_account.members["Log Archive"]' 333444555666
-# terraform import 'aws_organizations_account.members["Audit"]' 222333444555
+# For Control Tower, Terraform isn't used to create the accounts
 resource "aws_organizations_account" "members" {
-  for_each  = var.root_emails
-  name      = lookup(var.acc_map, each.key)
+  for_each  = local.workspace["control_tower"] ? {} : local.workspace["root_emails"]
+  name      = lookup(local.workspace.acc_map, each.key)
   email     = each.value
   parent_id = lookup(local.members, each.key)
-  role_name = "bedrock-terraform"
+  role_name = local.workspace.base_role
   lifecycle {
     prevent_destroy = true
     ignore_changes  = [role_name]

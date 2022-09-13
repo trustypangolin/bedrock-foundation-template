@@ -22,7 +22,7 @@ resource "aws_ecs_cluster_capacity_providers" "cluster" {
 }
 
 module "security_group" {
-  source = "gitlab.com/douughlabs/douugh-terraform-modules/aws//regional/security_group"
+  source = "../security_group"
   name   = format("%s_ecs_%s", var.env, var.instance_group)
   env    = var.env
   vpc_id = var.vpc.vpc_id

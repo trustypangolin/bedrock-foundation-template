@@ -15,24 +15,16 @@ data "terraform_remote_state" "org" {
 }
 
 locals {
-  management = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Management")
-  ]
   security = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Security")
   ]
-  central = data.terraform_remote_state.org.outputs.acc[
-    lookup(data.terraform_remote_state.org.outputs.acc_map, "Central")
-  ]
-  # development = data.terraform_remote_state.org.outputs.acc[
-  #   lookup(data.terraform_remote_state.org.outputs.acc_map, "Development")
-  # ]
   production = data.terraform_remote_state.org.outputs.acc[
     lookup(data.terraform_remote_state.org.outputs.acc_map, "Production")
   ]
-
   unique_prefix = data.terraform_remote_state.org.outputs.unique_prefix
   base_region   = data.terraform_remote_state.org.outputs.base_region
+  grafana_id    = data.terraform_remote_state.org.outputs.grafana_id
+  environment   = "production"
 }
 
 data "aws_regions" "current" {}

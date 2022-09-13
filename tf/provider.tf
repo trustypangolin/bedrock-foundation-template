@@ -12,7 +12,7 @@ provider "aws" {
   region = var.base_region
   default_tags {
     tags = {
-      Service = "Bedrock",
+      Service = "Bedrock"
       Version = "3.0.0"
     }
   }

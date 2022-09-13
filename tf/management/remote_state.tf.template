@@ -6,7 +6,7 @@ terraform {
 
 # terraform init \
 # -backend-config="bucket=unique_prefix-tfstate" \
-# -backend-config="key=bedrock/org management security central production development - pick the account name" \
+# -backend-config="key=bedrock/management" \
 # -backend-config="region=ap-southeast-2" \
 # -reconfigure
 

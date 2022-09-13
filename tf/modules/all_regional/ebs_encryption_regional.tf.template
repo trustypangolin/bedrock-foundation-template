@@ -1,5 +1,0 @@
-resource "aws_ebs_encryption_by_default" "replace" {
-  provider      = aws.replace
-  enabled = true
-}
-

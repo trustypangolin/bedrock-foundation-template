@@ -122,8 +122,8 @@ data "aws_iam_policy_document" "s3" {
       "s3:AbortMultipartUpload"
     ]
     resources = [
-      "arn:aws:s3:::douugh-backup-*",
-      "arn:aws:s3:::douugh-backup-*/*",
+      "arn:aws:s3:::${var.env}-backup-*",
+      "arn:aws:s3:::${var.env}-backup-*/*",
     ]
     effect = "Allow"
   }
@@ -165,14 +165,14 @@ data "aws_iam_policy_document" "ecs-exec" {
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:aws:s3:::douugh-tools-*/*"]
+    resources = ["arn:aws:s3:::${var.env}-tools-*/*"]
     actions   = ["s3:PutObject"]
   }
 
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:aws:s3:::douugh-tools-*"]
+    resources = ["arn:aws:s3:::${var.env}-tools-*"]
     actions   = ["s3:GetEncryptionConfiguration"]
   }
 

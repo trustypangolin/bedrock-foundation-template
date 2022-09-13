@@ -58,7 +58,7 @@ S3Bucket=$(cat terraform.tfvars | grep unique_prefix | cut -d '=' -f2 | tr -d '[
 AWSRegion=$(cat terraform.tfvars | grep region | cut -d '=' -f2 | tr -d '[:blank:]"')
 
 # Initialise the terraform state from the extracted variables
-terraform init                                    \
-      -backend-config="bucket=$S3Bucket-tfstate"  \
-      -backend-config="key=${ENVIRONMENT}"        \
+terraform init                                     \
+      -backend-config="bucket=$S3Bucket-tfstate"   \
+      -backend-config="key=bedrock/${ENVIRONMENT}" \
       -backend-config="region=$AWSRegion"

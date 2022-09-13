@@ -37,3 +37,9 @@ variable "sns_topic" {
   description = "SNS Topics"
   default     = null
 }
+
+variable "control_tower" {
+  description = "Control Tower"
+  type        = bool
+  default     = false
+}

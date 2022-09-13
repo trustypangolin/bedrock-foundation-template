@@ -1,6 +1,6 @@
-// DynamoDB Terraform state resources
+# DynamoDB Terraform state resources
 resource "aws_dynamodb_table" "terraform" {
-  name         = "bedrock-tfstate"
+  name         = format("%s-tfstate", var.bootstrap_prefix)
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
   attribute {

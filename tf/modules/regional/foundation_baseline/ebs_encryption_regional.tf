@@ -58,6 +58,11 @@ resource "aws_ebs_encryption_by_default" "eu-central-1" {
   enabled = true
 }
 
+resource "aws_ebs_encryption_by_default" "us-east-1" {
+  provider      = aws.us-east-1
+  enabled = true
+}
+
 resource "aws_ebs_encryption_by_default" "us-east-2" {
   provider      = aws.us-east-2
   enabled = true

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # excluding regions that have minimal support, baseline these manually
-declare -a exclude=(ap-northeast-3 us-east-1)
+declare -a exclude=(ap-northeast-3)
 
 # Remove existing files, and regenerate blank files
 for f in *.tf.template

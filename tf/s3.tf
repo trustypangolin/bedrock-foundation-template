@@ -24,6 +24,23 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "tfstate" {
   }
 }
 
+resource "aws_s3_bucket_lifecycle_configuration" "tfstate" {
+  bucket = aws_s3_bucket.tfstate.id
+  rule {
+    id = "Purge Deleted"
+    filter {}
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 90
+    }
+    expiration {
+      days                         = 0
+      expired_object_delete_marker = true
+    }
+    status = "Enabled"
+  }
+}
+
+
 # Block public access
 resource "aws_s3_bucket_public_access_block" "tfstate" {
   bucket                  = aws_s3_bucket.tfstate.id
@@ -44,7 +61,6 @@ data "aws_iam_policy_document" "tfstate" {
   statement {
     sid    = "AllowSSLRequestsOnly"
     effect = "Deny"
-
     resources = [
       aws_s3_bucket.tfstate.arn,
       format("%s/*", aws_s3_bucket.tfstate.arn)

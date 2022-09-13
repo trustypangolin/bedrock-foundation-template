@@ -1,5 +1,6 @@
 resource "aws_organizations_policy_attachment" "denyrootkeys" {
-  policy_id = aws_organizations_policy.deny_root_keys.id
+  count     = local.workspace["control_tower"] ? 0 : 1
+  policy_id = aws_organizations_policy.deny_root_keys[0].id
   target_id = data.aws_organizations_organization.org.roots[0].id
 }
 
@@ -20,6 +21,7 @@ resource "aws_organizations_policy_attachment" "denyrootkeys" {
 # }
 
 resource "aws_organizations_policy" "deny_del_s3" {
+  count       = local.workspace["control_tower"] ? 0 : 1
   name        = "Lock_Down_Audit_S3_Deletes"
   description = "Deny s3 objects and buckets from being deleted"
   type        = "SERVICE_CONTROL_POLICY"
@@ -48,6 +50,7 @@ CONTENT
 }
 
 resource "aws_organizations_policy" "deny_root_keys" {
+  count       = local.workspace["control_tower"] ? 0 : 1
   name        = "Deny_Root_keys"
   description = "Deny Root Keys from being created"
   type        = "SERVICE_CONTROL_POLICY"
@@ -78,6 +81,7 @@ CONTENT
 }
 
 resource "aws_organizations_policy" "stop_changes" {
+  count       = local.workspace["control_tower"] ? 0 : 1
   name        = "Deny_Org_Changes"
   description = "Stop changes to CloudTrail, Leaving Orgs, and Removing Config"
   type        = "SERVICE_CONTROL_POLICY"
@@ -126,6 +130,7 @@ CONTENT
 }
 
 resource "aws_organizations_policy" "limit_region" {
+  count       = local.workspace["control_tower"] ? 0 : 1
   name        = "Deny_Unused_Regions"
   description = "Limit what Regions resources can be applied in"
   type        = "SERVICE_CONTROL_POLICY"

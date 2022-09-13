@@ -1,21 +1,46 @@
 # Customer Repo Values to change. These must be unique, they are used for bucket names and root accounts
-unique_prefix = "uniqueidentity"  
+unique_prefix = "uniqueidentity"
 
 # These variables are common and defaults, but can be changed if required
 base_region = "ap-southeast-2"
 
+# This determines the roles created in sub accounts
+base_role = "bedrock-terraform"
+
+# Control Tower Integration
+control_tower = false
+
+# Common Naming
+bootstrap_prefix = "foundation"
+
 # Org Values
 root_emails = {
-  "Security"   = "aws+bedrock.sec@domain.abc"
-  "Central"    = "aws+bedrock.central@domain.abc"
-  "Production" = "aws+bedrock.prod@domain.abc"
+  "Security"    = "aws+root.security@domain.abc"
+  "Central"     = "aws+root.central@domain.abc"
+  "Development" = "aws+root.dev@domain.abc"
+}
+
+acc_map = {
+  Management  = "Actual Account Name"
+  Security    = "Actual Account Name"
+  Central     = "Actual Account Name"
+  Production  = "Actual Account Name"
+  Development = "Actual Account Name"
 }
 
 notifications = {
-  "billing"    = "aws+bedrock.billing@domain.abc"
-  "operations" = "aws+bedrock.operations@domain.abc"
-  "security"   = "aws+bedrock.security@domain.abc"
+  "billing"    = "aws+notify.billing@domain.abc"
+  "operations" = "aws+notify.operations@domain.abc"
+  "security"   = "aws+notify.security@domain.abc"
 }
+
+alt_contacts = <<-CSV
+  Function,Name,Title,Email,Phone
+  finance,Finance Person,CFO,finance@domain.abc,1300 000 000
+  BILLING,IT Billing Person,Manager,aws.billing@domain.abc,1300 000 000
+  OPERATIONS,IT Ops Person,Ops,aws.operations@domain.abc,0400 000 000
+  SECURITY,IT Security Person,Sec,aws.security@domain.abc,0400 000 000
+CSV
 
 grafana_id = "111111"
 

@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "s3" {
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:aws:s3:::douugh-tools-central"]
+    resources = ["arn:aws:s3:::${var.env}-tools-central"]
 
     actions = [
       "s3:GetBucketLocation",
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "s3" {
   statement {
     sid       = ""
     effect    = "Allow"
-    resources = ["arn:aws:s3:::douugh-tools-central/*"]
+    resources = ["arn:aws:s3:::${var.env}-tools-central/*"]
 
     actions = [
       "s3:AbortMultipartUpload",

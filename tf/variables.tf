@@ -22,6 +22,7 @@ variable "gitlab_role" {
   type    = bool
   default = false
 }
+
 variable "gitlab_idp" {
   type    = bool
   default = false
@@ -89,4 +90,23 @@ variable "bitbucket_workspace" {
 variable "bitbucket_workspaceid" {
   type    = string
   default = null
+}
+
+# Customise Entry Roles
+variable "bootstrap_prefix" {
+  type        = string
+  description = "To match customer naming polices, we create a Landing Zone prefix for state, role, dynamodb resources. Typically foundation,bedrock,landingzone etc"
+  default     = "foundation"
+}
+
+variable "oidc_role" {
+  type        = string
+  description = "Entry role suffix appended to bootstrap_prefix. This needs to match the OpenID initial Role"
+  default     = "terraform-oidc"
+}
+
+variable "base_role" {
+  type        = string
+  description = "This is the role that all accounts will use to deploy Terraform resources. Defaults to Control Tower Role"
+  default     = "AWSControlTowerExecution"
 }
