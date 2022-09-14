@@ -103,14 +103,25 @@ Parameters:
     Description: "Resource Prefix"
     Type: String
 
-  SNSNotificationAccountId:
-    Description: "The account id where SNS and SQS should be sent. Generally rhe security or audit account"
+  SNSDeadLetterTopic:
+    Description: "The arn where SNS DeadLetter should be sent"
     Type: String
 
-  SNSNotificationRegion:
-    Default: "ap-southeast-2"
+  # SNSNotificationAccountId:
+  #   Description: "The account id where SNS and SQS should be sent. Generally rhe security or audit account"
+  #   Type: String
+
+  # SNSNotificationRegion:
+  #   Default: "ap-southeast-2"
+  #   Type: String
+  #   Description: Account Region for the SNS notifications
+
+  CustomSchedules:
+    Default: "No"
     Type: String
-    Description: Account Region for the SNS notifications
+    AllowedValues:
+      - "Yes"
+      - "No"
   #--------------------------------------------------------------------------------------------------
 
   SchedulingActive:
@@ -161,8 +172,7 @@ Parameters:
       - 1280
       - 1408
       - 1536
-    Description:
-      Size of the Lambda function running the scheduler, increase size
+    Description: Size of the Lambda function running the scheduler, increase size
       when processing large numbers of instances.
 
   UseCloudWatchMetrics:
@@ -210,15 +220,13 @@ Parameters:
     AllowedValues:
       - "Yes"
       - "No"
-    Description:
-      Enable the solution to load SSM Maintenance Windows, so that they
+    Description: Enable the solution to load SSM Maintenance Windows, so that they
       can be used for EC2 instance Scheduling.
 
   TagName:
     Default: Schedule
     Type: String
-    Description:
-      Name of tag to use for associating instance schedule schemas with
+    Description: Name of tag to use for associating instance schedule schemas with
       service instances.
     MaxLength: 127
     MinLength: 1
@@ -662,30 +670,26 @@ Parameters:
 
   Regions:
     Type: CommaDelimitedList
-    Description:
-      List of regions in which instances are scheduled, leave blank for
+    Description: List of regions in which instances are scheduled, leave blank for
       current region only.
     Default: "ap-southeast-2,us-west-2,eu-west-2"
 
   CrossAccountRoles:
     Type: CommaDelimitedList
-    Description:
-      Comma separated list of ARN's for cross account access roles. These
+    Description: Comma separated list of ARN's for cross account access roles. These
       roles must be created in all checked accounts the scheduler to start and stop
       instances.
     Default: "arn:aws:iam::%PRODUCTIONACCOUNT%:role/bedrock-SchedulerRemote,arn:aws:iam::%TESTINGACCOUNT%:role/bedrock-SchedulerRemote,arn:aws:iam::%DEVELOPMENTACCOUNT%:role/bedrock-SchedulerRemote"
 
   StartedTags:
     Type: String
-    Description:
-      Comma separated list of tagname and values on the formt name=value,name=value,..
+    Description: Comma separated list of tagname and values on the formt name=value,name=value,..
       that are set on started instances
     Default: ""
 
   StoppedTags:
     Type: String
-    Description:
-      Comma separated list of tagname and values on the formt name=value,name=value,..
+    Description: Comma separated list of tagname and values on the formt name=value,name=value,..
       that are set on stopped instances
     Default: ""
 
@@ -709,6 +713,12 @@ Parameters:
       - "Yes"
       - "No"
     Description: Schedule instances in this account.
+
+#==========================================================================================================================================
+#                                             Conditions
+#==========================================================================================================================================
+Conditions:
+  ActivateCustomSchedules: !Equals [!Ref CustomSchedules, "Yes"]
 
 #==========================================================================================================================================
 #                                             MAPPINGS
@@ -763,8 +773,7 @@ Resources:
       cfn_nag:
         rules_to_suppress:
           - id: W84
-            reason:
-              CloudWatch log groups only have transactional data from the Lambda
+            reason: CloudWatch log groups only have transactional data from the Lambda
               function, this template has to be supported in gov cloud which doesn't
               yet have the feature to provide kms key id to cloudwatch log group.
 
@@ -844,8 +853,7 @@ Resources:
       cfn_nag:
         rules_to_suppress:
           - id: W12
-            reason:
-              Lambda needs the following minimum required permissions to send
+            reason: Lambda needs the following minimum required permissions to send
               trace data to X-Ray and access ENIs in a VPC.
 
   instanceschedulerlambdaLambdaFunctionServiceRole:
@@ -938,8 +946,7 @@ Resources:
       cfn_nag:
         rules_to_suppress:
           - id: W12
-            reason:
-              All policies have been scoped to be as restrictive as possible.
+            reason: All policies have been scoped to be as restrictive as possible.
               This solution needs to access ec2/rds resources across all regions.
 
   SchedulerPolicy:
@@ -980,7 +987,7 @@ Resources:
             Effect: Allow
             Action:
               - "sns:Publish"
-            Resource: "arn:aws:sns:*:*:deadletter"
+            Resource: !Ref SNSDeadLetterTopic # "arn:aws:sns:*:*:deadletter"
       Roles:
         - Ref: SchedulerRole
 
@@ -1024,7 +1031,7 @@ Resources:
               - Ref: AWS::Region
         S3Key: aws-instance-scheduler/v1.4.1/instance-scheduler.zip
       DeadLetterConfig:
-        TargetArn: !Sub arn:aws:sns:${SNSNotificationRegion}:${SNSNotificationAccountId}:deadletter
+        TargetArn: !Ref SNSDeadLetterTopic # arn:aws:sns:${SNSNotificationRegion}:${SNSNotificationAccountId}:deadletter
       Role: !GetAtt SchedulerRole.Arn
       Description: EC2 and RDS instance scheduler, version v1.4.1
       Handler: main.lambda_handler
@@ -1038,7 +1045,7 @@ Resources:
           CONFIG_TABLE: !Ref ConfigTable
           DDB_TABLE_NAME: !Ref StateTable
           ENV_BOTO_RETRY_LOGGING: "FALSE"
-          ISSUES_TOPIC_ARN: !Sub arn:aws:sns:${SNSNotificationRegion}:${SNSNotificationAccountId}:deadletter
+          ISSUES_TOPIC_ARN: !Ref SNSDeadLetterTopic # arn:aws:sns:${SNSNotificationRegion}:${SNSNotificationAccountId}:deadletter
           LOG_GROUP: !Ref SchedulerLogGroup
           MAINTENANCE_WINDOW_TABLE: !Ref MaintenanceWindowTable
           SCHEDULER_FREQUENCY: !Ref SchedulerFrequency
@@ -1100,16 +1107,13 @@ Resources:
       cfn_nag:
         rules_to_suppress:
           - id: W89
-            reason:
-              This Lambda function does not need to access any resource provisioned
+            reason: This Lambda function does not need to access any resource provisioned
               within a VPC.
           - id: W58
-            reason:
-              This Lambda function has permission provided to write to CloudWatch
+            reason: This Lambda function has permission provided to write to CloudWatch
               logs using the iam roles.
           - id: W92
-            reason:
-              Lambda function is only used by the event rule periodically, concurrent
+            reason: Lambda function is only used by the event rule periodically, concurrent
               calls are very limited.
 
   #==========================================================================================================================================
@@ -1129,8 +1133,7 @@ Resources:
   SchedulerRule:
     Type: AWS::Events::Rule
     Properties:
-      Description:
-        Instance Scheduler - Rule to trigger instance for scheduler function
+      Description: Instance Scheduler - Rule to trigger instance for scheduler function
         version v1.4.0
       ScheduleExpression:
         Fn::FindInMap:
@@ -1282,15 +1285,23 @@ Resources:
     UpdateReplacePolicy: Delete
     DeletionPolicy: Delete
 
+  # WaitHandle:
+  #   Type: AWS::CloudFormation::WaitConditionHandle
+  #   DependsOn: Main
+  #   Properties:
+
+  # ConditionHandle:
+  #   Type: AWS::CloudFormation::WaitCondition
+  #   DependsOn: Main
+  #   Properties:
+  #     Handle: !Ref "WaitHandle"
+  #     Timeout: 900
+
   #==========================================================================================================================================
   #                                             Custom Schedules
   #==========================================================================================================================================
   SydneyOfficeHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: AU-SYD-OfficeHours
@@ -1309,11 +1320,7 @@ Resources:
           WeekDays: Mon-Fri
 
   SydneyClosingHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: AU-SYD-ClosingHours
@@ -1331,11 +1338,7 @@ Resources:
           WeekDays: Mon-Sun
 
   OregonOfficeHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: US-Oregon-OfficeHours
@@ -1354,11 +1357,7 @@ Resources:
           WeekDays: Mon-Fri
 
   OregonClosingHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: US-Oregon-ClosingHours
@@ -1376,11 +1375,7 @@ Resources:
           WeekDays: Mon-Sun
 
   LondonOfficeHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: EU-London-OfficeHours
@@ -1399,11 +1394,7 @@ Resources:
           WeekDays: Mon-Fri
 
   LondonClosingHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: EU-London-ClosingHours
@@ -1421,11 +1412,7 @@ Resources:
           WeekDays: Mon-Sun
 
   BrisbaneOfficeHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: AU-BNE-OfficeHours
@@ -1444,11 +1431,7 @@ Resources:
           WeekDays: Mon-Fri
 
   BrisbaneClosingHours:
-    DependsOn:
-      - ConfigTable
-      - StateTable
-      - MaintenanceWindowTable
-      - Main
+    Condition: ActivateCustomSchedules
     Type: "Custom::ServiceInstanceSchedule"
     Properties:
       Name: AU-BNE-ClosingHours

@@ -32,6 +32,7 @@ variable "scheduler_params" {
     SCHEDULER_FREQUENCY = 15
     TAG_NAME            = "Schedule"
     Regions             = "SingleOnly"
+    custom_schedules    = "No" # This must be set to No on first Run
   }
 }
 
@@ -39,4 +40,9 @@ variable "bootstrap_prefix" {
   type        = string
   description = "Role Prefix"
   default     = "bedrock"
+}
+
+variable "snsarn" {
+  type = map(string)
+  description = "SNS topic for deadletter, must be in the same region"
 }

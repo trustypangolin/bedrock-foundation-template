@@ -8,12 +8,7 @@ locals {
     ]
   )
 
-  active_regions = var.scheduler_params["Regions"] == "SingleOnly" ? data.aws_region.current.name : join(",", [
-    for region in data.aws_regions.current.names : format(
-      format("%s", region)
-    )
-    ]
-  )
+  active_regions = var.scheduler_params["Regions"] == "SingleOnly" ? data.aws_region.current.name : var.scheduler_params["Regions"]
 }
 
 resource "aws_cloudformation_stack" "instance_scheduler" {
@@ -22,19 +17,22 @@ resource "aws_cloudformation_stack" "instance_scheduler" {
   capabilities = ["CAPABILITY_NAMED_IAM"]
   on_failure   = "ROLLBACK"
   parameters = {
+    CrossAccountRoles        = local.cross_account_roles
+    CustomSchedules          = var.scheduler_params["custom_schedules"]
+    DefaultTimezone          = "Australia/Brisbane"
     Prefix                   = var.bootstrap_prefix
     Regions                  = local.active_regions
-    CrossAccountRoles        = local.cross_account_roles
+    # SNSNotificationAccountId = data.aws_caller_identity.current.id
+    # SNSNotificationRegion    = data.aws_region.current.name
+    SNSDeadLetterTopic       = var.snsarn["deadletter"]
     SchedulerFrequency       = var.scheduler_params["SCHEDULER_FREQUENCY"]
-    DefaultTimezone          = "Australia/Brisbane"
-    SNSNotificationAccountId = data.aws_caller_identity.current.id
   }
   template_body = file("${path.module}/cloudformation/aws-instance-scheduler.yml")
 
   timeouts {
-    create = "10m"
-    update = "10m"
-    delete = "10m"
+    create = "30m"
+    update = "30m"
+    delete = "30m"
   }
 }
 
