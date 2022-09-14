@@ -78,10 +78,10 @@ resource "aws_organizations_organizational_unit" "operational" {
 # For Control Tower, Terraform isn't used to create the accounts
 resource "aws_organizations_account" "members" {
   for_each  = local.workspace["control_tower"] ? {} : local.workspace["root_emails"]
-  name      = lookup(local.workspace.acc_map, each.key)
+  name      = lookup(local.workspace["acc_map"], each.key)
   email     = each.value
   parent_id = lookup(local.members, each.key)
-  role_name = local.workspace.base_role
+  role_name = local.workspace["base_role"]
   lifecycle {
     prevent_destroy = true
     ignore_changes  = [role_name]

@@ -24,16 +24,7 @@ variable "notifications" {
 
 variable "acc_map" {
   description = "Account Name Mappings where the Account Name differs from the recommeneded names"
-  type = object(
-    {
-      Management  = string
-      LogArchive  = string
-      Security    = string
-      Central     = string
-      Development = string
-      Production  = string
-    }
-  )
+  type        = map(string)
   default = {
     Management  = "Management"
     LogArchive  = "Log Archive"
