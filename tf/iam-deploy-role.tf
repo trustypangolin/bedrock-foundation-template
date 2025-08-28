@@ -2,8 +2,13 @@ resource "aws_iam_role" "bedrock" {
   name                 = var.base_role
   description          = "Terraform will specifiy this role in provider.tf to deploy resources"
   assume_role_policy   = data.aws_iam_policy_document.bedrock_trust.json
-  managed_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+  # managed_policy_arns  = ["arn:aws:iam::aws:policy/AdministratorAccess"]
   max_session_duration = 43200
+}
+
+resource "aws_iam_role_policy_attachment" "bedrock_attach" {
+  role       = aws_iam_role.bedrock.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 data "aws_iam_policy_document" "bedrock_trust" {
